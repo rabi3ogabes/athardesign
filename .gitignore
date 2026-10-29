@@ -1,0 +1,11 @@
+.env
+storage/cache/*
+storage/logs/*
+public/uploads/*
+!storage/cache/.gitkeep
+!storage/logs/.gitkeep
+!public/uploads/.gitkeep
+.DS_Store
+Thumbs.db
+database/legacy-supabase/
+storage/installed.lock

@@ -1,0 +1,8 @@
+# If the hosting document root cannot be changed to /public,
+# this file forwards everything into public/ transparently.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(app|storage|database|tools)(/|$) - [F]
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
