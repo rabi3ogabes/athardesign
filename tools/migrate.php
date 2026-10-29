@@ -18,7 +18,8 @@ if (!Db::configured()) {
     exit(1);
 }
 $n = Installer::applySchema(Db::pdo());
-echo "Schema applied ({$n} statements) on " . env('DB_NAME') . "@" . env('DB_HOST', '127.0.0.1') . PHP_EOL;
+$s = Db::settings();
+echo "Schema applied ({$n} statements) on {$s['name']}@" . ($s['socket'] !== '' ? $s['socket'] : $s['host']) . PHP_EOL;
 if (in_array('--seed', $argv ?? [], true)) {
     echo Installer::seed();
 }

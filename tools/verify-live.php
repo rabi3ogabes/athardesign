@@ -19,7 +19,8 @@ $line = function (string $label, bool $pass, string $note = '') use (&$ok): void
     echo ($pass ? '[ OK ] ' : '[FAIL] ') . $label . ($note !== '' ? ' — ' . $note : '') . PHP_EOL;
 };
 
-echo 'Database: ' . env('DB_NAME') . '@' . env('DB_HOST', '127.0.0.1') . PHP_EOL . PHP_EOL;
+$s = Db::settings();
+echo 'Database: ' . $s['name'] . '@' . ($s['socket'] !== '' ? $s['socket'] : $s['host']) . PHP_EOL . PHP_EOL;
 
 $line('Admin accounts', Users::count() >= 1, Users::count() . ' user(s)');
 
