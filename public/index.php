@@ -67,7 +67,7 @@ try {
     // normalise trailing slashes for SEO
     if (strlen($request->fullPath) > 1 && str_ends_with((string)parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH), '/')) {
         $qs = $_SERVER['QUERY_STRING'] ?? '';
-        Response::redirect(base_url() . rtrim($request->fullPath, '/') . ($qs ? '?' . $qs : ''), 301);
+        Response::redirect(rtrim($request->fullPath, '/') . ($qs ? '?' . $qs : ''), 301);
     }
     I18n::setLang($lang);
     $request->path = $path;

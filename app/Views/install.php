@@ -1,6 +1,8 @@
 <?php /** @var int $step @var string $lang @var string $dir @var array $flashes @var array $requirements @var string $detectedUrl @var array $timezones */
 $steps = [1 => t('install.step_requirements'), 2 => t('install.step_database'), 3 => t('install.step_admin'), 4 => t('install.step_done')];
-$base = base_url();
+// relative URLs on purpose: APP_URL may name another host than the one the installer is opened on
+$base = '';
+$rel = static fn (string $p): string => (string)preg_replace('#^https?://[^/]+#', '', asset($p));
 ?>
 <!DOCTYPE html>
 <html lang="<?= e($lang) ?>" dir="<?= e($dir) ?>">
@@ -8,8 +10,8 @@ $base = base_url();
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
 <title><?= e(t('install.title')) ?> · أثر</title>
 <link rel="icon" href="<?= e($base) ?>/assets/img/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="<?= e(asset('assets/css/fonts.css')) ?>">
-<link rel="stylesheet" href="<?= e(asset('assets/css/admin.css')) ?>">
+<link rel="stylesheet" href="<?= e($rel('assets/css/fonts.css')) ?>">
+<link rel="stylesheet" href="<?= e($rel('assets/css/admin.css')) ?>">
 </head>
 <body class="admin auth install">
 <main class="auth__box auth__box--wide">
@@ -42,19 +44,9 @@ $base = base_url();
     <a class="btn btn--primary btn--block" href="<?= e($base) ?>/install"><?= icon('arrows-clockwise') ?><span><?= e(t('install.recheck')) ?></span></a>
 
   <?php elseif ($step === 2): ?>
-    <h1><?= e(t('install.db_title')) ?></h1>
-    <p class="auth__sub"><?= e(t('install.db_sub')) ?></p>
-    <form method="post" action="<?= e($base) ?>/install" class="stack" autocomplete="off">
-      <?= csrf_field() ?><input type="hidden" name="step" value="database">
-      <div class="grid-2 install__grid">
-        <?= view('admin/partials/field', ['name' => 'db_host', 'label' => t('install.db_host'), 'value' => old('db_host', 'localhost'), 'required' => true, 'attrs' => 'dir="ltr" autofocus', 'hint' => t('install.db_host_hint')]) ?>
-        <?= view('admin/partials/field', ['name' => 'db_port', 'label' => t('install.db_port'), 'type' => 'number', 'value' => old('db_port', '3306'), 'required' => true, 'attrs' => 'min="1" max="65535"']) ?>
-      </div>
-      <?= view('admin/partials/field', ['name' => 'db_name', 'label' => t('install.db_name'), 'value' => old('db_name'), 'required' => true, 'attrs' => 'dir="ltr"', 'hint' => t('install.db_name_hint')]) ?>
-      <div class="grid-2 install__grid">
-        <?= view('admin/partials/field', ['name' => 'db_user', 'label' => t('install.db_user'), 'value' => old('db_user'), 'required' => true, 'attrs' => 'dir="ltr"']) ?>
-        <?= view('admin/partials/field', ['name' => 'db_pass', 'label' => t('install.db_pass'), 'type' => 'password', 'attrs' => 'autocomplete="new-password"']) ?>
-      </div>
+    <?php
+    // website address + timezone (shared by both forms below)
+    $siteSettings = static function () use ($detectedUrl, $timezones): void { ?>
       <details class="install__more">
         <summary><?= e(t('install.site_settings')) ?></summary>
         <div class="stack install__more-body">
@@ -62,9 +54,51 @@ $base = base_url();
           <?= view('admin/partials/field', ['name' => 'app_timezone', 'label' => t('install.timezone'), 'type' => 'select', 'value' => old('app_timezone', 'Asia/Qatar'), 'options' => array_combine($timezones, $timezones)]) ?>
         </div>
       </details>
-      <button class="btn btn--primary btn--block" type="submit" data-busy="<?= e(t('install.db_busy')) ?>"><?= icon('lightning') ?><span><?= e(t('install.db_submit')) ?></span></button>
-      <p class="hint install__hint"><?= e(t('install.db_note')) ?></p>
-    </form>
+    <?php };
+    // manual connection form
+    $manualForm = static function (bool $autofocus) use ($base, $siteSettings): void { ?>
+      <form method="post" action="<?= e($base) ?>/install" class="stack" autocomplete="off">
+        <?= csrf_field() ?><input type="hidden" name="step" value="database"><input type="hidden" name="source" value="form">
+        <div class="grid-2 install__grid">
+          <?= view('admin/partials/field', ['name' => 'db_host', 'label' => t('install.db_host'), 'value' => old('db_host', 'localhost'), 'required' => true, 'attrs' => 'dir="ltr"' . ($autofocus ? ' autofocus' : ''), 'hint' => t('install.db_host_hint')]) ?>
+          <?= view('admin/partials/field', ['name' => 'db_port', 'label' => t('install.db_port'), 'type' => 'number', 'value' => old('db_port', '3306'), 'required' => true, 'attrs' => 'min="1" max="65535"']) ?>
+        </div>
+        <?= view('admin/partials/field', ['name' => 'db_name', 'label' => t('install.db_name'), 'value' => old('db_name'), 'required' => true, 'attrs' => 'dir="ltr"', 'hint' => t('install.db_name_hint')]) ?>
+        <div class="grid-2 install__grid">
+          <?= view('admin/partials/field', ['name' => 'db_user', 'label' => t('install.db_user'), 'value' => old('db_user'), 'required' => true, 'attrs' => 'dir="ltr"']) ?>
+          <?= view('admin/partials/field', ['name' => 'db_pass', 'label' => t('install.db_pass'), 'type' => 'password', 'attrs' => 'autocomplete="new-password"']) ?>
+        </div>
+        <?php $siteSettings(); ?>
+        <button class="btn btn--primary btn--block" type="submit" data-busy="<?= e(t('install.db_busy')) ?>"><?= icon('lightning') ?><span><?= e(t('install.db_submit')) ?></span></button>
+        <p class="hint install__hint"><?= e(t('install.db_note')) ?></p>
+      </form>
+    <?php };
+    ?>
+    <h1><?= e(t('install.db_title')) ?></h1>
+    <?php if (!empty($envDb)): ?>
+      <p class="auth__sub"><?= e(t('install.db_detected_sub')) ?></p>
+      <form method="post" action="<?= e($base) ?>/install" class="stack" autocomplete="off">
+        <?= csrf_field() ?><input type="hidden" name="step" value="database"><input type="hidden" name="source" value="env">
+        <div class="install__found">
+          <div class="install__found-head"><?= icon('check-circle') ?><strong><?= e(t('install.db_detected')) ?></strong></div>
+          <dl class="install__kv" dir="ltr">
+            <dt><?= e(t('install.db_host')) ?></dt><dd><?= e($envDb['host']) ?></dd>
+            <dt><?= e(t('install.db_name')) ?></dt><dd><?= e($envDb['name']) ?></dd>
+            <dt><?= e(t('install.db_user')) ?></dt><dd><?= e($envDb['user']) ?></dd>
+          </dl>
+        </div>
+        <?php $siteSettings(); ?>
+        <button class="btn btn--primary btn--block" type="submit" data-busy="<?= e(t('install.db_busy')) ?>" autofocus><?= icon('lightning') ?><span><?= e(t('install.db_detected_use')) ?></span></button>
+        <p class="hint install__hint"><?= e(t('install.db_note')) ?></p>
+      </form>
+      <details class="install__more install__other">
+        <summary><?= e(t('install.db_other')) ?></summary>
+        <div class="install__more-body"><?php $manualForm(false); ?></div>
+      </details>
+    <?php else: ?>
+      <p class="auth__sub"><?= e(t('install.db_sub')) ?></p>
+      <?php $manualForm(true); ?>
+    <?php endif; ?>
 
   <?php elseif ($step === 3): ?>
     <h1><?= e(t('setup.title')) ?></h1>

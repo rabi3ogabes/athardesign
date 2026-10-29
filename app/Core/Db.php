@@ -53,9 +53,38 @@ final class Db
         return Rpc::$fn(...array_values($args));
     }
 
+    /**
+     * Effective connection settings from .env: the DB_* keys first, then the names most hosting
+     * panels write for PHP apps (DB_DATABASE / DB_USERNAME / DB_PASSWORD), then a DATABASE_URL.
+     */
+    public static function settings(): array
+    {
+        $s = [
+            'host'   => (string)env('DB_HOST', '127.0.0.1'),
+            'port'   => (int)env('DB_PORT', 3306),
+            'name'   => (string)(env('DB_NAME') ?? env('DB_DATABASE') ?? ''),
+            'user'   => (string)(env('DB_USER') ?? env('DB_USERNAME') ?? ''),
+            'pass'   => (string)(env('DB_PASS') ?? env('DB_PASSWORD') ?? ''),
+            'socket' => (string)env('DB_SOCKET', ''),
+        ];
+        if ($s['name'] === '' || $s['user'] === '') {
+            $url = (string)env('DATABASE_URL', '');
+            $p = $url !== '' ? parse_url($url) : false;
+            if (is_array($p) && in_array($p['scheme'] ?? '', ['mysql', 'mariadb'], true)) {
+                $s['host'] = (string)($p['host'] ?? $s['host']);
+                $s['port'] = (int)($p['port'] ?? $s['port']);
+                $s['name'] = ltrim((string)($p['path'] ?? ''), '/');
+                $s['user'] = rawurldecode((string)($p['user'] ?? ''));
+                $s['pass'] = rawurldecode((string)($p['pass'] ?? ''));
+            }
+        }
+        return $s;
+    }
+
     public static function configured(): bool
     {
-        return (string)env('DB_NAME', '') !== '' && (string)env('DB_USER', '') !== '';
+        $s = self::settings();
+        return $s['name'] !== '' && $s['user'] !== '';
     }
 
     public static function pdo(): PDO
@@ -66,14 +95,8 @@ final class Db
         if (!self::configured()) {
             throw new DbException('The database is not configured. Set DB_HOST, DB_NAME, DB_USER and DB_PASS in .env (or open /install).');
         }
-        self::$pdo = self::connect(
-            (string)env('DB_HOST', '127.0.0.1'),
-            (int)env('DB_PORT', 3306),
-            (string)env('DB_NAME', ''),
-            (string)env('DB_USER', ''),
-            (string)env('DB_PASS', ''),
-            (string)env('DB_SOCKET', '')
-        );
+        $s = self::settings();
+        self::$pdo = self::connect($s['host'], $s['port'], $s['name'], $s['user'], $s['pass'], $s['socket']);
         return self::$pdo;
     }
 

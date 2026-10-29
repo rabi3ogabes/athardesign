@@ -28,14 +28,16 @@ final class InstallController
     {
         Session::start();
         $path = rtrim($r->fullPath, '/') ?: '/';
+        // relative redirects on purpose: APP_URL may still point at another host name
+        // (a hosting panel often pre-fills it), which would otherwise loop with the server's own www redirect
         if ($path !== '/install') {
-            Response::redirect(base_url() . '/install');
+            Response::redirect('/install');
         }
         // language toggle (?lang=ar|en), remembered in the session
         $lang = $r->query('lang');
         if (is_string($lang) && in_array($lang, I18n::LANGS, true)) {
             Session::set('install_lang', $lang);
-            Response::redirect(base_url() . '/install');
+            Response::redirect('/install');
         }
         I18n::setLang((string)Session::get('install_lang', 'en'));
 
@@ -73,6 +75,7 @@ final class InstallController
 
     private function database(Request $r): void
     {
+        $socket = '';
         $in = [
             'db_host' => $r->str('db_host', '127.0.0.1') ?: '127.0.0.1',
             'db_port' => (string)max(1, $r->int('db_port', 3306)),
@@ -82,13 +85,19 @@ final class InstallController
             'app_url' => rtrim($r->str('app_url'), '/'),
             'app_timezone' => $r->str('app_timezone', 'Asia/Qatar') ?: 'Asia/Qatar',
         ];
+        // "Use this database": the hosting panel already wrote the connection into .env
+        if ($r->str('source') === 'env' && Db::configured()) {
+            $env = Db::settings();
+            $socket = $env['socket'];
+            $in = ['db_host' => $env['host'], 'db_port' => (string)$env['port'], 'db_name' => $env['name'], 'db_user' => $env['user'], 'db_pass' => $env['pass']] + $in;
+        }
         $v = Validator::make($in, ['db_name' => 'required|max:64', 'db_user' => 'required|max:64', 'db_host' => 'required|max:191']);
         if ($v->fails()) $this->fail($v->first(), $in);
         if ($in['app_url'] !== '' && !preg_match('#^https?://[^\s/]+$#i', $in['app_url'])) $this->fail(t('install.err_url'), $in);
         if (!in_array($in['app_timezone'], timezone_identifiers_list(), true)) $in['app_timezone'] = 'Asia/Qatar';
 
         try {
-            $pdo = Db::connect($in['db_host'], (int)$in['db_port'], $in['db_name'], $in['db_user'], $in['db_pass']);
+            $pdo = Db::connect($in['db_host'], (int)$in['db_port'], $in['db_name'], $in['db_user'], $in['db_pass'], $socket);
         } catch (DbException $e) {
             $this->fail(t('install.err_connect') . ' ' . $e->getMessage(), $in);
         }
@@ -103,7 +112,7 @@ final class InstallController
                 'APP_ENV' => 'production', 'APP_DEBUG' => 'false',
                 'APP_URL' => $in['app_url'], 'APP_TIMEZONE' => $in['app_timezone'],
                 'DB_HOST' => $in['db_host'], 'DB_PORT' => $in['db_port'], 'DB_NAME' => $in['db_name'], 'DB_USER' => $in['db_user'], 'DB_PASS' => $in['db_pass'],
-            ]);
+            ] + ($socket !== '' ? ['DB_SOCKET' => $socket] : []));
         } catch (\Throwable $e) {
             $this->fail($e->getMessage(), $in);
         }
@@ -115,7 +124,7 @@ final class InstallController
             $this->fail(t('install.err_seed') . ' ' . $e->getMessage(), $in);
         }
         Session::flash('success', t('install.db_done'));
-        Response::redirect(base_url() . '/install');
+        Response::redirect('/install');
     }
 
     private function admin(Request $r): void
@@ -133,14 +142,15 @@ final class InstallController
         Auth::login($user);
         Activity::log('install', 'admin_users', (string)($user['id'] ?? ''));
         Session::set('install_complete', true);
-        Response::redirect(base_url() . '/install');
+        Response::redirect('/install');
     }
 
     private function fail(string $message, array $input): never
     {
+        unset($input['db_pass'], $input['password'], $input['password_confirmation']);
         Session::flash('error', $message);
         Session::keepOld($input);
-        Response::redirect(base_url() . '/install');
+        Response::redirect('/install');
     }
 
     private function show(int $step): never
@@ -152,7 +162,12 @@ final class InstallController
             }
             Session::forget('install_complete'); // the final screen is shown once
         }
-        $detected = base_url();
+        // a connection the hosting panel already wrote into .env (shown without its password)
+        $envDb = null;
+        if ($step === 2 && Db::configured()) {
+            $s = Db::settings();
+            $envDb = ['host' => $s['socket'] !== '' ? $s['socket'] : $s['host'] . ':' . $s['port'], 'name' => $s['name'], 'user' => $s['user']];
+        }
         $flashes = Session::flashes();
         echo View::make('install', [
             'step' => $step,
@@ -160,7 +175,8 @@ final class InstallController
             'dir' => I18n::dir(),
             'flashes' => $flashes,
             'requirements' => Installer::requirements(),
-            'detectedUrl' => $detected,
+            'envDb' => $envDb,
+            'detectedUrl' => detected_url(),
             'timezones' => ['Asia/Qatar', 'Asia/Riyadh', 'Asia/Dubai', 'Asia/Kuwait', 'Asia/Bahrain', 'Asia/Muscat', 'Africa/Cairo', 'Europe/London', 'UTC'],
         ]);
         Response::finish();

@@ -64,11 +64,18 @@ function base_url(): string
     if ($configured !== '') {
         return $base = rtrim($configured, '/');
     }
+    return $base = detected_url();
+}
+
+/** Scheme + host of the current request (what the visitor typed), ignoring APP_URL */
+function detected_url(): string
+{
     $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+        || (($_SERVER['HTTP_CF_VISITOR'] ?? '') !== '' && str_contains((string)$_SERVER['HTTP_CF_VISITOR'], 'https'));
     $host = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost';
     $host = preg_replace('/[^a-zA-Z0-9.\-:\[\]]/', '', (string)$host);
-    return $base = ($https ? 'https' : 'http') . '://' . $host;
+    return ($https ? 'https' : 'http') . '://' . $host;
 }
 
 /** Versioned asset URL */
