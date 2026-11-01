@@ -129,7 +129,9 @@ final class Packages
                 : "Hello {site}, I would like to order the {package} package ({tier}) for {category}{price_line}.\nPlease contact me to get started.";
         }
         $price = self::price($p, $lang);
-        $priceLine = $price === '' ? '' : ($lang === 'ar' ? ' بسعر ' . $price : ' at ' . $price);
+        $period = trim(tr($p['period'] ?? '', $lang));
+        $priceText = $price . ($period !== '' ? ' ' . $period : '');
+        $priceLine = $price === '' ? '' : ($lang === 'ar' ? ' بسعر ' . $priceText : ' at ' . $priceText);
         $map = [
             '{site}'       => setting_tr('site_name'),
             '{package}'    => tr($p['name'] ?? '', $lang),
