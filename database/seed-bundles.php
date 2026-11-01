@@ -177,6 +177,34 @@ if ($page) {
     }
 }
 
+// the home page: show the bundles right before "Our services" (added once; the admin can move or edit it later)
+$home = Db::from('pages')->eq('slug', 'home')->first();
+if ($home) {
+    $blocks = is_array($home['blocks']) ? $home['blocks'] : [];
+    $has = array_filter($blocks, fn($blk) => ($blk['type'] ?? '') === 'packages');
+    if ($has === []) {
+        $homeBlock = ['type' => 'packages', 'anchor' => 'packages', 'theme' => 'ink', 'hidden' => false, 'data' => [
+            'eyebrow' => $ar('الباقات والأسعار', 'Packages & pricing'),
+            'heading' => $ar('باقات شهرية بسعر واضح، من المحتوى إلى الموقع', 'Monthly packages with a clear price, from content to website'),
+            'intro' => $introNew,
+            'category' => 'bundle', 'layout' => 'tabs', 'show_custom' => true,
+        ]];
+        $at = null;
+        foreach ($blocks as $i => $blk) {
+            if (($blk['type'] ?? '') === 'services') { $at = $i; break; }
+        }
+        if ($at === null) {
+            foreach ($blocks as $i => $blk) {
+                if (($blk['type'] ?? '') === 'portfolio') { $at = $i; break; }
+            }
+        }
+        $at ??= min(2, count($blocks));
+        array_splice($blocks, $at, 0, [$homeBlock]);
+        Db::from('pages')->eq('id', $home['id'])->update(['blocks' => array_values($blocks)]);
+        $out('home page: packages block added before the services block');
+    }
+}
+
 if ($fresh) {
     // park the single-line packages as drafts (kept for the admin to reuse)
     foreach (['website', 'social'] as $cat) {
