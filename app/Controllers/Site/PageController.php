@@ -36,7 +36,7 @@ final class PageController extends SiteController
         $page = Pages::bySlug('404');
         $blocks = $page ? (array)$page['blocks'] : [];
         $title = $page ? tr($page['title']) : t('site.not_found_title');
-        $ctx = ['page' => $page, 'path' => $request->fullPath];
+        $ctx = ['page' => $page, 'path' => $request->fullPath, 'promote_h1' => false]; // the 404 view prints its own H1
         return $this->page($request, 'site/page', [
             'page' => $page,
             'blocksHtml' => Blocks::renderAll($blocks, $ctx),
@@ -72,6 +72,7 @@ final class PageController extends SiteController
             'description' => tr($page['meta_description']) ?: null,
             'keywords' => tr($page['meta_keywords']) ?: null,
             'image' => $page['og_image'] ?: null,
+            'page_type' => ['contact' => 'ContactPage', 'about' => 'AboutPage'][$page['slug']] ?? 'WebPage',
             'path' => $path,
             'canonical' => $page['canonical_url'] ?: null,
             'noindex' => (bool)$page['noindex'],

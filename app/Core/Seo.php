@@ -56,7 +56,15 @@ final class Seo
         $h[] = '<meta property="og:description" content="' . e($description) . '">';
         $h[] = '<meta property="og:url" content="' . e($canonical) . '">';
         $h[] = '<meta property="og:image" content="' . e($image) . '">';
+        if (str_ends_with($image, '/assets/img/og-default.jpg')) {
+            $h[] = '<meta property="og:image:width" content="1200">';
+            $h[] = '<meta property="og:image:height" content="630">';
+        }
+        $h[] = '<meta property="og:image:alt" content="' . e($fullTitle) . '">';
         $h[] = '<meta property="og:locale" content="' . ($lang === 'ar' ? 'ar_QA' : 'en_QA') . '">';
+        if (($o['alternates'] ?? true) && I18n::englishEnabled()) {
+            $h[] = '<meta property="og:locale:alternate" content="' . ($lang === 'ar' ? 'en_QA' : 'ar_QA') . '">';
+        }
         $h[] = '<meta name="twitter:card" content="summary_large_image">';
         $h[] = '<meta name="twitter:title" content="' . e($fullTitle) . '">';
         $h[] = '<meta name="twitter:description" content="' . e($description) . '">';
@@ -67,9 +75,28 @@ final class Seo
         $bv = trim((string)setting('bing_verification', ''));
         if ($bv !== '') $h[] = '<meta name="msvalidate.01" content="' . e($bv) . '">';
 
-        // JSON-LD
-        $graph = [self::organization()];
-        if (!empty($o['breadcrumbs'])) $graph[] = self::breadcrumbs($o['breadcrumbs']);
+        // JSON-LD: organization + website + this page (+ breadcrumbs and page-specific nodes)
+        $graph = [self::organization(), self::website()];
+        $page = [
+            '@type' => preg_match('/^[A-Za-z]+$/', (string)($o['page_type'] ?? '')) ? $o['page_type'] : 'WebPage',
+            '@id' => $canonical . '#webpage',
+            'url' => $canonical,
+            'name' => $fullTitle,
+            'description' => $description,
+            'inLanguage' => $lang === 'ar' ? 'ar-QA' : 'en-QA',
+            'isPartOf' => ['@id' => base_url() . '/#website'],
+            'about' => ['@id' => base_url() . '/#organization'],
+            'primaryImageOfPage' => ['@type' => 'ImageObject', 'url' => $image],
+        ];
+        if (!empty($o['breadcrumbs'])) {
+            $crumbs = self::breadcrumbs($o['breadcrumbs']);
+            $crumbs['@id'] = $canonical . '#breadcrumb';
+            $page['breadcrumb'] = ['@id' => $canonical . '#breadcrumb'];
+            $graph[] = $page;
+            $graph[] = $crumbs;
+        } else {
+            $graph[] = $page;
+        }
         if (!empty($o['jsonld'])) {
             foreach ($o['jsonld'] as $node) $graph[] = $node;
         }
@@ -96,8 +123,25 @@ final class Seo
         ];
         $logo = (string)setting('logo', '');
         $node['logo'] = $logo !== '' ? media_url($logo) : base_url() . '/assets/img/logo-mark-1024.png';
+        $node['image'] = $node['logo'];
+        $slogan = setting_tr('tagline');
+        if ($slogan !== '') $node['slogan'] = $slogan;
+        $node['knowsLanguage'] = ['ar', 'en'];
+        $node['currenciesAccepted'] = 'QAR';
+        $prices = [];
+        foreach (\App\Models\Packages::published() as $p) {
+            if ($p['price'] !== null && $p['price'] !== '' && strtoupper((string)($p['currency'] ?: 'QAR')) === 'QAR') $prices[] = (float)$p['price'];
+        }
+        if ($prices) $node['priceRange'] = 'QAR ' . number_format(min($prices), 0, '.', ',') . ' - ' . number_format(max($prices), 0, '.', ',');
         $phone = trim((string)setting('phone', ''));
         if ($phone !== '') $node['telephone'] = $phone;
+        $wa = preg_replace('/\D+/', '', (string)setting('whatsapp_number', ''));
+        if (strlen($wa) >= 8 || $phone !== '') {
+            $contact = ['@type' => 'ContactPoint', 'contactType' => 'sales', 'availableLanguage' => ['Arabic', 'English'], 'areaServed' => 'QA'];
+            if ($phone !== '') $contact['telephone'] = $phone;
+            if (strlen($wa) >= 8) $contact['url'] = 'https://wa.me/' . $wa;
+            $node['contactPoint'] = $contact;
+        }
         $email = trim((string)setting('email', ''));
         if ($email !== '') $node['email'] = $email;
         $address = setting_tr('address');
@@ -110,6 +154,18 @@ final class Seo
         }
         if ($sameAs) $node['sameAs'] = $sameAs;
         return $node;
+    }
+
+    public static function website(): array
+    {
+        return [
+            '@type' => 'WebSite',
+            '@id' => base_url() . '/#website',
+            'url' => base_url() . '/',
+            'name' => setting_tr('site_name', 'أثر لتصميم الويب'),
+            'inLanguage' => I18n::englishEnabled() ? ['ar', 'en'] : ['ar'],
+            'publisher' => ['@id' => base_url() . '/#organization'],
+        ];
     }
 
     public static function breadcrumbs(array $items): array

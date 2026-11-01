@@ -247,6 +247,15 @@ final class Blocks
             if (!empty($block['hidden'])) continue;
             $html .= self::render($block, $i, $ctx);
         }
+        // Every page needs exactly one H1: when no hero block provides it, the first block heading is promoted.
+        if (($ctx['promote_h1'] ?? true) && !str_contains($html, '<h1')) {
+            $open = '<h2 class="display';
+            $pos = strpos($html, $open);
+            $end = $pos === false ? false : strpos($html, '</h2>', $pos);
+            if ($pos !== false && $end !== false) {
+                $html = substr($html, 0, $pos) . '<h1 class="display' . substr($html, $pos + strlen($open), $end - $pos - strlen($open)) . '</h1>' . substr($html, $end + 5);
+            }
+        }
         return $html;
     }
 

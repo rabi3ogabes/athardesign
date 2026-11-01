@@ -28,6 +28,6 @@ if (!$items) return;
         </li>
       <?php endforeach; ?>
     </ul>
-    <div class="service-preview" aria-hidden="true" data-service-preview><img alt="" loading="lazy"></div>
+    <div class="service-preview" aria-hidden="true" data-service-preview><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" width="320" height="400" loading="lazy" decoding="async"></div>
   </div>
 </section>

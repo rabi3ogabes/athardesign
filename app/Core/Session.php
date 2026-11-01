@@ -13,6 +13,7 @@ final class Session
             self::$started = true;
             return;
         }
+        session_cache_limiter(''); // Response::html sets Cache-Control itself (PHP's default no-store blocks back/forward cache)
         session_start();
         self::$started = true;
         // move one-shot flash data for this request

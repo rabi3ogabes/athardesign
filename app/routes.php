@@ -198,6 +198,7 @@ $router->post('/contact', [S\ContactController::class, 'submit']);
 $router->post('/track', [S\TrackController::class, 'click']);
 $router->get('/sitemap.xml', [S\SitemapController::class, 'sitemap']);
 $router->get('/robots.txt', [S\SitemapController::class, 'robots']);
+$router->get('/llms.txt', [S\SitemapController::class, 'llms']);
 $router->get('/m/o/{token:[a-f0-9]+}.gif', [S\MailTrackController::class, 'open']);
 $router->get('/m/c/{token:[a-f0-9]+}', [S\MailTrackController::class, 'click']);
 $router->any('/m/u/{token:[a-f0-9]+}', [S\MailTrackController::class, 'unsubscribe']);

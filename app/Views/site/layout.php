@@ -5,6 +5,7 @@ use App\Core\Session;
 
 $siteName = setting_tr('site_name');
 $logo = (string)setting('logo', '') ?: ('/assets/img/logo' . (lang() === 'en' ? '-en' : '') . (in_array((string)setting('theme', 'ink'), ['ivory', 'sand'], true) ? '-light' : '') . '.svg');
+$logoDefault = (string)setting('logo', '') === '';
 $favicon = (string)setting('favicon', '');
 $wa = whatsapp_link();
 $otherLang = I18n::other();
@@ -84,7 +85,7 @@ $themeBg = $themes[$theme]['bg'];
   <div class="nav-pill" data-nav>
     <a class="brand" href="<?= e(url('/')) ?>" aria-label="<?= e($siteName) ?>">
       <?php if ($logo !== ''): ?>
-        <img src="<?= e(media_url($logo)) ?>" alt="<?= e($siteName) ?>" height="40" class="brand__img">
+        <img src="<?= e(media_url($logo)) ?>" alt="<?= e($siteName) ?>"<?= $logoDefault ? ' width="110"' : '' ?> height="40" class="brand__img">
       <?php else: ?>
         <span class="brand__mark" aria-hidden="true">أثر</span>
         <span class="brand__name"><?= e($siteName) ?></span>
@@ -146,7 +147,7 @@ $themeBg = $themes[$theme]['bg'];
       <div class="footer__brand">
         <a class="brand brand--lg" href="<?= e(url('/')) ?>">
           <?php if ($logo !== ''): ?>
-            <img src="<?= e(media_url($logo)) ?>" alt="<?= e($siteName) ?>" height="56" loading="lazy" class="brand__img brand__img--lg">
+            <img src="<?= e(media_url($logo)) ?>" alt="<?= e($siteName) ?>"<?= $logoDefault ? ' width="154"' : '' ?> height="56" loading="lazy" decoding="async" class="brand__img brand__img--lg">
           <?php else: ?>
             <span class="brand__mark" aria-hidden="true">أثر</span>
             <span class="brand__name"><?= e($siteName) ?></span>

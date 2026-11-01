@@ -17,6 +17,11 @@ final class Response
     {
         http_response_code($status);
         header('Content-Type: text/html; charset=UTF-8');
+        if (!isset($headers['Cache-Control'])) {
+            $uri = (string)($_SERVER['REQUEST_URI'] ?? '');
+            // admin and installer pages must never be cached; public pages may be revalidated (keeps bfcache working)
+            $headers['Cache-Control'] = (str_starts_with($uri, '/admin') || str_starts_with($uri, '/install')) ? 'no-store' : 'private, no-cache';
+        }
         foreach ($headers as $k => $v) header($k . ': ' . $v);
         echo $body;
         self::finish();
