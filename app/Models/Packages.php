@@ -11,7 +11,7 @@ use App\Core\Db;
  */
 final class Packages
 {
-    public const TIERS = ['silver', 'elite', 'premium'];
+    public const TIERS = ['silver', 'elite', 'premium', 'custom'];
     public const CATEGORIES = ['bundle', 'website', 'social', 'seo', 'photography'];
 
     /** @return array<string,array{ar:string,en:string}> */
@@ -33,7 +33,14 @@ final class Packages
             'silver'  => ['ar' => 'سيلفر', 'en' => 'Silver'],
             'elite'   => ['ar' => 'إيليت', 'en' => 'Elite'],
             'premium' => ['ar' => 'بريميوم', 'en' => 'Premium'],
+            'custom'  => ['ar' => 'مخصصة', 'en' => 'Custom'],
         ];
+    }
+
+    /** Icon name for a tier medal */
+    public static function tierIcon(string $tier): string
+    {
+        return ['silver' => 'sparkle', 'elite' => 'medal', 'premium' => 'crown-simple', 'custom' => 'sliders-horizontal'][$tier] ?? 'sparkle';
     }
 
     public static function published(): array

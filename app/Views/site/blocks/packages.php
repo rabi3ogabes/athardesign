@@ -32,7 +32,7 @@ $icoFor = fn(string $k) => $k === 'social' ? 'instagram-logo' : ($k === 'seo' ? 
 
     <?php foreach ($groups as $k => $list): $show = $stacked || $k === $first; ?>
       <?php if ($stacked && count($keys) > 1): ?><h3 class="pk-line" data-reveal><span class="pk-line__ico"><?= icon($icoFor($k)) ?></span><?= e($cats[$k][lang()] ?? $k) ?></h3><?php endif; ?>
-      <div class="pk-grid <?= $show ? 'is-active' : '' ?>" <?= $stacked ? '' : 'role="tabpanel" id="' . e($uid . '-panel-' . $k) . '" aria-labelledby="' . e($uid . '-tab-' . $k) . '"' ?> data-pk-panel="<?= e($k) ?>" <?= $show ? '' : 'hidden' ?> style="--n:<?= count($list) ?>">
+      <div class="pk-grid <?= $show ? 'is-active' : '' ?> <?= count($list) >= 4 ? 'pk-grid--wide' : '' ?>" <?= $stacked ? '' : 'role="tabpanel" id="' . e($uid . '-panel-' . $k) . '" aria-labelledby="' . e($uid . '-tab-' . $k) . '"' ?> data-pk-panel="<?= e($k) ?>" <?= $show ? '' : 'hidden' ?> style="--n:<?= count($list) ?>">
         <?php foreach ($list as $i => $p): ?>
           <?= view('site/partials/package-card', ['p' => $p, 'tiers' => $tiers, 'compact' => true, 'i' => $i]) ?>
         <?php endforeach; ?>

@@ -148,8 +148,8 @@ if ($count('pages') === 0) {
         $blk('packages', [
             'eyebrow' => $ar('الباقات والأسعار', 'Packages & pricing'),
             'heading' => $ar('باقات شهرية بسعر واضح، من المحتوى إلى الموقع', 'Monthly packages with a clear price, from content to website'),
-            'intro' => $ar('سيلفر للمحتوى، وإيليت وبريميوم مع موقع إلكتروني ونطاق لسنة وبريد رسمي. اختر باقتك واطلبها عبر واتساب برسالة جاهزة.', 'Silver for content, Elite and Premium with a website, a one-year domain and business email. Pick yours and order on WhatsApp with a ready-made message.'),
-            'category' => 'bundle', 'layout' => 'tabs', 'show_custom' => true,
+            'intro' => $ar('سيلفر للمحتوى، وإيليت وبريميوم مع موقع إلكتروني ونطاق لسنة وبريد رسمي. وإن أردت أرقامًا مختلفة أو تطبيق جوال، فالباقة على مقاسك تُسعَّر مع فريق المبيعات.', 'Silver for content, Elite and Premium with a website, a one-year domain and business email. Need different numbers or a mobile app? The made-to-measure package is priced with our sales team.'),
+            'category' => 'bundle', 'layout' => 'tabs', 'show_custom' => false,
         ], 'ink', 'packages'),
         $blk('services', ['eyebrow' => $ar('خدماتنا', 'Our services'), 'heading' => $ar('كل ما يحتاجه حضورك الرقمي، في مكان واحد', 'Everything your digital presence needs, in one place'), 'intro' => $ar('', ''), 'source' => 'all', 'limit' => 6, 'show_link' => true], 'ink', 'services'),
         $blk('portfolio', ['eyebrow' => $ar('أعمال مختارة', 'Selected work'), 'heading' => $ar('مشاريع تركت أثرًا', 'Projects that left a mark'), 'intro' => $ar('', ''), 'source' => 'featured', 'category' => '', 'limit' => 3, 'layout' => 'bento', 'show_filters' => false, 'show_link' => true], 'ink', 'work'),

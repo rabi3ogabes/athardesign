@@ -366,7 +366,7 @@ CREATE TABLE IF NOT EXISTS packages (
   UNIQUE KEY uq_packages_slug (slug),
   KEY idx_packages_category (category, tier, sort_order),
   CONSTRAINT chk_packages_category CHECK (category IN ('bundle','website','social','seo','photography')),
-  CONSTRAINT chk_packages_tier CHECK (tier IN ('silver','elite','premium')),
+  CONSTRAINT chk_packages_tier CHECK (tier IN ('silver','elite','premium','custom')),
   CONSTRAINT chk_packages_status CHECK (status IN ('draft','published'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 

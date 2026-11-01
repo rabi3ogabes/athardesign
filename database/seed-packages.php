@@ -165,7 +165,7 @@ if (Db::from('pages')->select('id')->eq('slug', 'packages')->first() === null) {
             'eyebrow' => $ar('باقاتنا', 'Our packages'),
             'heading' => $ar("اختر الباقة التي تناسب طموحك", 'Choose the package that fits your ambition'),
             'intro' => $ar('ثلاث فئات واضحة لكل خدمة: سيلفر، إيليت، وبريميوم. اختر باقتك واطلبها عبر واتساب برسالة جاهزة، وسنعود إليك خلال ساعات.', 'Three clear tiers for every service: Silver, Elite and Premium. Pick yours and order on WhatsApp with a ready-made message; we reply within hours.'),
-            'category' => 'all', 'show_custom' => true,
+            'category' => 'all', 'show_custom' => false,
         ], 'ink', 'packages'),
         $blk('faq', ['eyebrow' => $ar('أسئلة شائعة', 'FAQ'), 'heading' => $ar('قبل أن تختار', 'Before you choose'), 'intro' => $ar('', ''), 'items' => [
             ['question' => $ar('هل يمكن تعديل الباقة؟', 'Can a package be customised?'), 'answer' => $ar('نعم. الباقات نقطة انطلاق، ويمكن إضافة أو حذف عناصر بحسب نشاطك، ونؤكد السعر النهائي عبر واتساب.', 'Yes. Packages are a starting point; items can be added or removed to fit your business, and we confirm the final price on WhatsApp.')],

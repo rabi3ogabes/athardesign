@@ -1,6 +1,6 @@
 <?php
 /**
- * Combined monthly packages (Silver / Elite / Premium): social media content,
+ * Combined monthly packages (Silver / Elite / Premium, plus a made-to-measure one): social media content,
  * and from Elite upwards a business website with domain and email.
  *
  * Idempotent and re-runnable:
@@ -121,11 +121,57 @@ $rows = [
         ),
         'meta_keywords' => $ar('وكالة سوشيال ميديا قطر, باقة شاملة موقع وسوشيال ميديا الدوحة, إدارة حسابات انستقرام وتيك توك قطر', 'social media agency qatar, complete website and social media package doha, instagram tiktok management qatar'),
     ],
+    [
+        'slug' => 'bundle-custom', 'category' => 'bundle', 'tier' => 'custom', 'sort_order' => 40,
+        'name' => $ar('باقة على مقاسك', 'Made-to-Measure'),
+        'badge' => $ar('مرنة بالكامل', 'Fully flexible'),
+        'tagline' => $ar(
+            'أنت تحدد الأرقام: عدد المنشورات والفيديوهات، جلسة تصوير، تطبيق جوال، موقع بمزايا متقدمة، وعدد حسابات البريد. نجمعها في عرض واحد بسعر يُتفق عليه مع فريق المبيعات.',
+            'You set the numbers: posts and videos per month, a photo session, a mobile app, a website with advanced features and how many email accounts. We shape it into one offer, priced with our sales team.'
+        ),
+        'price' => null, 'currency' => 'QAR', 'price_prefix' => $ar('', ''), 'period' => $ar('', ''),
+        'price_note' => $ar('يُحدد السعر مع فريق المبيعات بعد مكالمة قصيرة لفهم احتياجك، وتصلك خلال 24 ساعة بعرض مفصّل.', 'The price is agreed with our sales team after a short discovery call; a detailed quote reaches you within 24 hours.'),
+        'delivery' => $ar('جدول زمني يُحدد حسب نطاق العمل', 'Timeline agreed per scope of work'),
+        'features' => $feat([
+            ['X منشور سوشيال ميديا شهريًا، بالعدد الذي تختاره', 'X social media posts a month, the number you choose'],
+            ['و/أو X فيديو قصير (ريلز) شهريًا', 'and/or X short videos (Reels) a month'],
+            ['و/أو جلسة تصوير احترافية للمنتجات أو الفريق', 'and/or a professional photo session for products or team'],
+            ['و/أو تطبيق جوال لنشاطك (iOS وأندرويد)', 'and/or a mobile application for your business (iOS & Android)'],
+            ['موقع إلكتروني بمزايا متقدمة: حجز، متجر، بوابة دفع، لوحة تحكم', 'Website with advanced features: booking, store, payment gateway, dashboard'],
+            ['X حساب بريد إلكتروني رسمي باسم نشاطك', 'X business email accounts on your domain'],
+            ['السعر يُحدد مع فريق المبيعات حسب ما تختاره', 'Price discussed with the sales team based on your selection'],
+            ['مدير حساب واحد لكل خدماتك وتقرير شهري', 'One account manager for everything, with a monthly report'],
+        ]),
+        'cta_text' => $ar('تحدث مع المبيعات', 'Talk to sales'),
+        'whatsapp_message' => $ar(
+            "مرحبًا {site}، أرغب بتجهيز باقة على مقاسي تشمل:\n• منشورات سوشيال ميديا شهريًا: __\n• فيديوهات قصيرة شهريًا: __\n• جلسة تصوير: نعم / لا\n• تطبيق جوال: نعم / لا\n• موقع إلكتروني بمزايا متقدمة: نعم / لا\n• حسابات بريد إلكتروني: __\nالرجاء التواصل معي لتحديد السعر.\n{url}",
+            "Hello {site}, I would like a made-to-measure package with:\n• Social media posts per month: __\n• Short videos per month: __\n• Photo session: yes / no\n• Mobile application: yes / no\n• Website with advanced features: yes / no\n• Business email accounts: __\nPlease contact me to agree the price.\n{url}"
+        ),
+        'body' => $ar(
+            '<p>ليست كل الأنشطة متشابهة: مطعم يحتاج محتوى يوميًا وتطبيق طلبات، وعيادة تحتاج موقع حجز وبريدًا لكل طبيب، وشركة تحتاج هوية وصورًا للفريق. الباقة على مقاسك تجمع ما تحتاجه فقط، بالكميات التي تناسبك، في عرض واحد وفريق واحد.</p><h2>كيف تعمل الباقة؟</h2><ol><li><strong>أخبرنا بالأرقام:</strong> كم منشورًا وفيديو شهريًا، هل تريد جلسة تصوير، تطبيق جوال، موقعًا بمزايا متقدمة، وكم حساب بريد.</li><li><strong>نجهّز العرض:</strong> فريق المبيعات يدرس احتياجك ويعود إليك خلال 24 ساعة بعرض مفصّل وجدول زمني واضح.</li><li><strong>نبدأ التنفيذ:</strong> مدير حساب واحد يتابع كل الخدمات، مع تقرير شهري بالنتائج.</li></ol><h2>ما الذي يمكن إضافته؟</h2><p>موقع إلكتروني بمزايا متقدمة (حجز إلكتروني، متجر، بوابة دفع، لوحة تحكم، أكثر من لغة)، تطبيق جوال لنظامي iOS وأندرويد، إدارة سوشيال ميديا بأي عدد من المنشورات والفيديوهات، جلسات تصوير للمنتجات والأطباق والفريق، وبريد إلكتروني رسمي لكل موظف.</p><h2>لمن هذه الباقة؟</h2><p>للمطاعم والعيادات والشركات في قطر التي تحتاج أكثر من باقة جاهزة، أو تريد البدء بخدمة واحدة وتوسيعها لاحقًا دون تغيير الفريق.</p>',
+            "<p>No two businesses are alike: a restaurant needs daily content and an ordering app, a clinic needs a booking website and an email for every doctor, a company needs an identity and team photos. The made-to-measure package brings together only what you need, in the quantities that suit you, with one offer and one team.</p><h2>How it works</h2><ol><li><strong>Tell us the numbers:</strong> how many posts and videos a month, whether you want a photo session, a mobile app, a website with advanced features, and how many email accounts.</li><li><strong>We shape the offer:</strong> our sales team studies your needs and comes back within 24 hours with a detailed quote and a clear timeline.</li><li><strong>We deliver:</strong> one account manager follows every service, with a monthly results report.</li></ol><h2>What can be included?</h2><p>A website with advanced features (online booking, store, payment gateway, dashboard, multiple languages), a mobile application for iOS and Android, social media management with any number of posts and videos, photo sessions for products, dishes and teams, and a business email for every employee.</p><h2>Who is it for?</h2><p>Restaurants, clinics and companies in Qatar that need more than a ready-made package, or want to start with one service and grow it later without changing teams.</p>"
+        ),
+        'meta_title' => $ar('باقة على مقاسك: موقع، تطبيق جوال، سوشيال ميديا وتصوير في قطر | أثر', 'Made-to-measure package: website, mobile app, social media & photography in Qatar | Athar'),
+        'meta_description' => $ar(
+            'اختر عدد المنشورات والفيديوهات، جلسة التصوير، تطبيق الجوال، موقعًا بمزايا متقدمة وعدد حسابات البريد. باقة مرنة لأنشطة قطر بسعر يُحدد مع فريق المبيعات.',
+            'Choose your number of posts and videos, a photo session, a mobile app, a website with advanced features and your email accounts. A flexible package for Qatar businesses, priced with our sales team.'
+        ),
+        'meta_keywords' => $ar('باقة تسويق مخصصة قطر, تطوير تطبيقات جوال الدوحة, تصميم موقع متقدم قطر, عرض سعر سوشيال ميديا', 'custom marketing package qatar, mobile app development doha, advanced website qatar, social media quote'),
+    ],
 ];
 
 $defaults = ['is_highlighted' => false, 'badge' => $ar('', ''), 'price_note' => $ar('', ''), 'whatsapp_message' => $ar('', ''), 'cta_text' => $ar('', ''), 'image' => '', 'status' => 'published'];
 // fields the admin may have changed by hand: never overwritten on a refresh
 $adminOwned = ['status', 'image', 'whatsapp_message', 'cta_text'];
+
+// databases created before the "custom" tier existed: widen the tier check (schema.sql already has it)
+$pdo = Db::pdo();
+$clause = (string)($pdo->query("SELECT CHECK_CLAUSE FROM information_schema.CHECK_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND CONSTRAINT_NAME = 'chk_packages_tier'")->fetchColumn() ?: '');
+if ($clause !== '' && !str_contains($clause, 'custom')) {
+    $pdo->exec('ALTER TABLE packages DROP CONSTRAINT chk_packages_tier');
+    $pdo->exec("ALTER TABLE packages ADD CONSTRAINT chk_packages_tier CHECK (tier IN ('silver','elite','premium','custom'))");
+    $out('packages: "custom" tier allowed');
+}
 
 $existing = [];
 foreach (Db::from('packages')->eq('category', 'bundle')->get() as $row) {
@@ -150,10 +196,12 @@ $out("bundle packages: {$inserted} inserted, {$updated} refreshed");
 $introOld = [
     'ثلاث باقات مدمجة تجمع الموقع والسوشيال ميديا في عرض واحد: سيلفر، إيليت، وبريميوم. اختر باقتك واطلبها عبر واتساب برسالة جاهزة.',
     'Three combined packages that bring website and social media together in one offer: Silver, Elite and Premium. Pick yours and order on WhatsApp with a ready-made message.',
+    'ثلاث باقات شهرية بسعر واحد واضح: سيلفر للمحتوى، وإيليت وبريميوم مع موقع إلكتروني ونطاق لسنة وبريد رسمي. اختر باقتك واطلبها عبر واتساب برسالة جاهزة.',
+    'Three monthly packages with one clear price: Silver for content, Elite and Premium with a website, a one-year domain and business email. Pick yours and order on WhatsApp with a ready-made message.',
 ];
 $introNew = $ar(
-    'ثلاث باقات شهرية بسعر واحد واضح: سيلفر للمحتوى، وإيليت وبريميوم مع موقع إلكتروني ونطاق لسنة وبريد رسمي. اختر باقتك واطلبها عبر واتساب برسالة جاهزة.',
-    'Three monthly packages with one clear price: Silver for content, Elite and Premium with a website, a one-year domain and business email. Pick yours and order on WhatsApp with a ready-made message.'
+    'ثلاث باقات شهرية بسعر واحد واضح: سيلفر للمحتوى، وإيليت وبريميوم مع موقع إلكتروني ونطاق لسنة وبريد رسمي. وإن أردت أرقامًا مختلفة أو تطبيق جوال، فالباقة على مقاسك تُسعَّر مع فريق المبيعات.',
+    'Three monthly packages with one clear price: Silver for content, Elite and Premium with a website, a one-year domain and business email. Need different numbers or a mobile app? The made-to-measure package is priced with our sales team.'
 );
 $page = Db::from('pages')->eq('slug', 'packages')->first();
 if ($page) {
@@ -161,6 +209,7 @@ if ($page) {
     $changed = false;
     foreach ($blocks as &$blk) {
         if (($blk['type'] ?? '') !== 'packages') continue;
+        if (!empty($blk['data']['show_custom'])) { $blk['data']['show_custom'] = false; $changed = true; }
         if ($fresh) {
             $blk['data']['category'] = 'bundle';
             $blk['data']['intro'] = $introNew;
@@ -173,7 +222,7 @@ if ($page) {
     unset($blk);
     if ($changed) {
         Db::from('pages')->eq('id', $page['id'])->update(['blocks' => $blocks]);
-        $out('packages page intro updated');
+        $out('packages page block refreshed');
     }
 }
 
@@ -187,7 +236,7 @@ if ($home) {
             'eyebrow' => $ar('الباقات والأسعار', 'Packages & pricing'),
             'heading' => $ar('باقات شهرية بسعر واضح، من المحتوى إلى الموقع', 'Monthly packages with a clear price, from content to website'),
             'intro' => $introNew,
-            'category' => 'bundle', 'layout' => 'tabs', 'show_custom' => true,
+            'category' => 'bundle', 'layout' => 'tabs', 'show_custom' => false,
         ]];
         $at = null;
         foreach ($blocks as $i => $blk) {
@@ -202,6 +251,18 @@ if ($home) {
         array_splice($blocks, $at, 0, [$homeBlock]);
         Db::from('pages')->eq('id', $home['id'])->update(['blocks' => array_values($blocks)]);
         $out('home page: packages block added before the services block');
+    } else {
+        $changed = false;
+        foreach ($blocks as &$blk) {
+            if (($blk['type'] ?? '') !== 'packages') continue;
+            if (!empty($blk['data']['show_custom'])) { $blk['data']['show_custom'] = false; $changed = true; }
+            if (in_array((string)($blk['data']['intro']['ar'] ?? ''), $introOld, true) || in_array((string)($blk['data']['intro']['en'] ?? ''), $introOld, true)) { $blk['data']['intro'] = $introNew; $changed = true; }
+        }
+        unset($blk);
+        if ($changed) {
+            Db::from('pages')->eq('id', $home['id'])->update(['blocks' => $blocks]);
+            $out('home page: packages block refreshed');
+        }
     }
 }
 

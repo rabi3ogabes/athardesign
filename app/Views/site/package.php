@@ -18,7 +18,7 @@ $cta = tr($p['cta_text']) ?: t('site.package_order');
     <div class="pk-hero__grid">
       <div class="pk-hero__text">
         <p class="eyebrow" data-reveal><?= e($catLabel) ?></p>
-        <div class="pk__tier pk__tier--lg" data-reveal><span class="pk__medal pk__medal--<?= e($p['tier']) ?>" aria-hidden="true"><?= icon($p['tier'] === 'premium' ? 'crown-simple' : ($p['tier'] === 'elite' ? 'medal' : 'sparkle')) ?></span><span><?= e($tierLabel) ?></span><?php if (!empty($p['is_highlighted'])): ?><em class="pk__badge pk__badge--inline"><?= icon('star') ?><?= e(tr($p['badge']) ?: t('site.package_most_popular')) ?></em><?php endif; ?></div>
+        <div class="pk__tier pk__tier--lg" data-reveal><span class="pk__medal pk__medal--<?= e($p['tier']) ?>" aria-hidden="true"><?= icon(Packages::tierIcon($p['tier'])) ?></span><span><?= e($tierLabel) ?></span><?php if (!empty($p['is_highlighted'])): ?><em class="pk__badge pk__badge--inline"><?= icon('star') ?><?= e(tr($p['badge']) ?: t('site.package_most_popular')) ?></em><?php endif; ?></div>
         <h1 class="display display--xl" data-reveal><?= e(tr($p['name'])) ?></h1>
         <?php if (tr($p['tagline']) !== ''): ?><p class="lede" data-reveal><?= e(tr($p['tagline'])) ?></p><?php endif; ?>
         <div class="btn-row" data-reveal>

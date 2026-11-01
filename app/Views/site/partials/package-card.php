@@ -17,7 +17,7 @@ $detail = url('/packages/' . $p['slug']);
 <article class="pk <?= $hl ? 'pk--hl' : '' ?> pk--<?= e($p['tier']) ?>" data-reveal data-tier="<?= e($p['tier']) ?>" style="--i:<?= (int)($i ?? 0) ?>">
   <div class="pk__inner">
     <?php if ($badge !== ''): ?><span class="pk__badge"><?= icon('star') ?><?= e($badge) ?></span><?php endif; ?>
-    <div class="pk__tier"><span class="pk__medal pk__medal--<?= e($p['tier']) ?>" aria-hidden="true"><?= icon($p['tier'] === 'premium' ? 'crown-simple' : ($p['tier'] === 'elite' ? 'medal' : 'sparkle')) ?></span><span><?= e($tiers[$p['tier']][lang()] ?? $p['tier']) ?></span></div>
+    <div class="pk__tier"><span class="pk__medal pk__medal--<?= e($p['tier']) ?>" aria-hidden="true"><?= icon(Packages::tierIcon($p['tier'])) ?></span><span><?= e($tiers[$p['tier']][lang()] ?? $p['tier']) ?></span></div>
     <h3 class="pk__name"><a href="<?= e($detail) ?>" data-track="package" data-label="card-<?= e($p['slug']) ?>"><?= e(tr($p['name'])) ?></a></h3>
     <?php if (tr($p['tagline']) !== ''): ?><p class="pk__tag"><?= e(tr($p['tagline'])) ?></p><?php endif; ?>
     <div class="pk__price">

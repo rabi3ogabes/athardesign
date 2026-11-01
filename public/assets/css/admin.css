@@ -475,6 +475,7 @@ select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csv
 .tier--silver { background: #eef0f3; color: #4d5663; }
 .tier--elite { background: #f6ecd4; color: #7a5c25; }
 .tier--premium { background: #1b1711; color: #e3cb92; }
+.tier--custom { background: #e8ecf5; color: #2f3f6b; }
 .text-brass { color: #a8853f; vertical-align: middle; }
 .tier-pick { display: flex; gap: .5rem; flex-wrap: wrap; padding-top: .3rem; }
 .tier-pick__opt { cursor: pointer; }

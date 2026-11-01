@@ -683,6 +683,9 @@ html[lang="en"] .card__h { font-weight: 500; }
 .pk--silver { --pk-glow: color-mix(in srgb, #C9CDD3 28%, transparent); }
 .pk--elite { --pk-glow: color-mix(in srgb, var(--brass) 30%, transparent); }
 .pk--premium { --pk-glow: color-mix(in srgb, #E9CB7A 34%, transparent); }
+.pk--custom { --pk-glow: color-mix(in srgb, var(--ivory) 16%, transparent); }
+.pk--custom .pk__inner { background-image: repeating-linear-gradient(135deg, transparent 0 14px, color-mix(in srgb, var(--ivory) 2.5%, transparent) 14px 15px); }
+.section--ivory .pk--custom .pk__inner { background-image: repeating-linear-gradient(135deg, transparent 0 14px, color-mix(in srgb, var(--ink) 3%, transparent) 14px 15px); }
 .pk__badge { position: absolute; top: 1.1rem; inset-inline-end: 1.1rem; display: inline-flex; align-items: center; gap: .35rem; padding: .35rem .75rem; border-radius: 999px; font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; background: var(--brass); color: var(--ink); z-index: 2; }
 .pk__badge .icon { width: 12px; height: 12px; }
 .pk__badge--inline { position: static; margin-inline-start: .6rem; }
@@ -692,6 +695,7 @@ html[lang="en"] .card__h { font-weight: 500; }
 .pk__medal .icon { width: 16px; height: 16px; }
 .pk__medal--elite { background: linear-gradient(145deg, var(--brass-2), var(--brass) 55%, color-mix(in srgb, var(--brass) 70%, black)); }
 .pk__medal--premium { background: linear-gradient(145deg, #FBE8B0, #D9B45A 50%, #8E6B1E); }
+.pk__medal--custom { background: linear-gradient(145deg, var(--ink-3), var(--ink) 60%, black); color: var(--brass); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brass) 55%, transparent), 0 6px 14px -8px rgba(0, 0, 0, .6); }
 .pk__tier--lg .pk__medal { width: 44px; height: 44px; }
 .pk__tier--lg .pk__medal .icon { width: 20px; height: 20px; }
 .pk__name { font-family: var(--font-display); font-size: clamp(1.5rem, 2.2vw, 1.95rem); line-height: 1.25; margin-top: .2rem; }
@@ -740,6 +744,10 @@ html[lang="en"] .pk__amount { font-weight: 500; }
 .checklist--off { opacity: .75; }
 .checklist--off .icon { color: var(--fg-mute); }
 .packages--compare .pk-grid { grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); max-width: 980px; }
+.pk-grid--wide { gap: 1rem; }
+.pk-grid--wide .pk__inner { padding: clamp(1.35rem, 2vw, 1.8rem); }
+.pk-grid--wide .pk__name { font-size: clamp(1.35rem, 1.7vw, 1.6rem); }
+@media (max-width: 1280px) { .pk-grid--wide { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 1024px) { .pk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pk--hl { order: -1; grid-column: 1 / -1; } .pk--hl .pk__inner { max-width: none; } }
 @media (max-width: 900px) { .pk-hero__grid { grid-template-columns: 1fr; } .pk-tabs { width: 100%; overflow-x: auto; scrollbar-width: none; } .pk-tabs__btn { flex: 1; justify-content: center; } }
 @media (max-width: 640px) { .pk-grid, .packages--compare .pk-grid { grid-template-columns: 1fr; } .pk--hl { order: 0; } .pk__actions .btn { width: 100%; } }
