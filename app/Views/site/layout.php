@@ -22,17 +22,25 @@ $themes = App\Models\Settings::themes();
 $theme = (string)setting('theme', 'ink'); if (!isset($themes[$theme])) $theme = 'ink';
 $accent = (string)setting('accent_color', '');
 $accent = preg_match('/^#[0-9A-Fa-f]{6}$/', $accent) ? $accent : '';
-$headingFont = (string)setting('heading_font', 'serif');
-$fontRegular = (string)setting('custom_font_regular', '');
-$fontBold = (string)setting('custom_font_bold', '');
-$fontOk = $fontRegular !== '' && (bool)preg_match('#^/uploads/fonts/font-[a-f0-9]{12}\.(woff2|woff|ttf|otf)$#', $fontRegular);
-if (!in_array($headingFont, ['serif', 'sans', 'custom'], true) || ($headingFont === 'custom' && !$fontOk)) $headingFont = 'serif';
+$fontKeys = array_keys(App\Models\Settings::fonts());
+$fontIsFile = fn(string $p) => $p !== '' && (bool)preg_match('#^/uploads/fonts/font-[a-f0-9]{12}\.(woff2|woff|ttf|otf)$#', $p);
+$fontFiles = []; // uploaded custom typeface: css weight => public path
+foreach (App\Models\Settings::fontSlots() as [$slotKey, $weight]) {
+    $p = (string)setting($slotKey, '');
+    if ($fontIsFile($p)) $fontFiles[$weight] = $p;
+}
+$customOk = isset($fontFiles['400']);
+$headingFont = (string)setting('heading_font', 'lusail');
+if (!in_array($headingFont, $fontKeys, true) || ($headingFont === 'custom' && !$customOk)) $headingFont = 'lusail';
+$bodyFont = (string)setting('body_font', 'lusail');
+if (!in_array($bodyFont, $fontKeys, true) || ($bodyFont === 'custom' && !$customOk)) $bodyFont = 'lusail';
 $fontFormat = fn(string $p) => ['woff2' => 'woff2', 'woff' => 'woff', 'ttf' => 'truetype', 'otf' => 'opentype'][pathinfo($p, PATHINFO_EXTENSION)] ?? 'truetype';
+$preloadFont = ($headingFont === 'lusail' || $bodyFont === 'lusail') ? '/assets/fonts/lusail/Lusail-Regular.woff2' : '/assets/fonts/f1.woff2';
 $radius = setting('radius', 'soft') === 'sharp' ? 'sharp' : 'soft';
 $themeBg = $themes[$theme]['bg'];
 ?>
 <!DOCTYPE html>
-<html lang="<?= e($lang) ?>" dir="<?= e($dir) ?>" data-base="<?= e(base_url()) ?>" data-lang="<?= e($lang) ?>" data-theme="<?= e($theme) ?>" data-fonts="<?= e($headingFont) ?>" data-radius="<?= e($radius) ?>" class="no-js">
+<html lang="<?= e($lang) ?>" dir="<?= e($dir) ?>" data-base="<?= e(base_url()) ?>" data-lang="<?= e($lang) ?>" data-theme="<?= e($theme) ?>" data-fonts="<?= e($headingFont) ?>" data-body="<?= e($bodyFont) ?>" data-radius="<?= e($radius) ?>" class="no-js">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -48,12 +56,12 @@ $themeBg = $themes[$theme]['bg'];
 <link rel="apple-touch-icon" href="<?= e(base_url()) ?>/assets/img/apple-touch-icon.png">
 <link rel="manifest" href="<?= e(base_url()) ?>/site.webmanifest">
 <?php endif; ?>
-<link rel="preload" href="<?= e(base_url()) ?>/assets/fonts/f1.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="<?= e(base_url() . $preloadFont) ?>" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="<?= e(asset('assets/css/fonts.css')) ?>">
 <link rel="stylesheet" href="<?= e(asset('assets/css/site.css')) ?>">
-<?php if ($headingFont === 'custom'): ?>
-<link rel="preload" href="<?= e(base_url() . $fontRegular) ?>" as="font" type="font/<?= e(pathinfo($fontRegular, PATHINFO_EXTENSION)) ?>" crossorigin>
-<style>@font-face{font-family:'AtharCustom';font-weight:400;font-display:swap;src:url('<?= e(base_url() . $fontRegular) ?>') format('<?= e($fontFormat($fontRegular)) ?>')}<?php if ($fontBold !== '' && preg_match('#^/uploads/fonts/font-[a-f0-9]{12}\.(woff2|woff|ttf|otf)$#', $fontBold)): ?>@font-face{font-family:'AtharCustom';font-weight:600 700;font-display:swap;src:url('<?= e(base_url() . $fontBold) ?>') format('<?= e($fontFormat($fontBold)) ?>')}<?php endif; ?>html[data-fonts="custom"]{--font-display:'AtharCustom','Amiri','Cormorant Garamond',serif<?= setting('custom_font_body', false) ? ";--font-body:'AtharCustom','IBM Plex Sans Arabic','Plus Jakarta Sans',system-ui,sans-serif" : '' ?>}</style>
+<?php if ($headingFont === 'custom' || $bodyFont === 'custom'): ?>
+<link rel="preload" href="<?= e(base_url() . $fontFiles['400']) ?>" as="font" type="font/<?= e(pathinfo($fontFiles['400'], PATHINFO_EXTENSION)) ?>" crossorigin>
+<style><?php foreach ($fontFiles as $weight => $p): ?>@font-face{font-family:'AtharCustom';font-weight:<?= e($weight) ?>;font-display:swap;src:url('<?= e(base_url() . $p) ?>') format('<?= e($fontFormat($p)) ?>')}<?php endforeach; ?>html[data-fonts="custom"]{--font-display:'AtharCustom','Lusail','Amiri',sans-serif}html[data-body="custom"]{--font-body:'AtharCustom','Lusail','IBM Plex Sans Arabic',system-ui,sans-serif}</style>
 <?php endif; ?>
 <?php if ($accent !== ''): ?><style>:root{--brass:<?= e($accent) ?>;--brass-2:color-mix(in srgb,<?= e($accent) ?> 72%,white)}</style><?php endif; ?>
 <script>document.documentElement.classList.replace('no-js','js');</script>

@@ -10,7 +10,7 @@ use App\Models\Settings;
 final class SettingsController extends AdminController
 {
     private const I18N = ['site_name', 'tagline', 'header_cta_text', 'footer_text', 'whatsapp_message', 'address', 'working_hours', 'meta_title_suffix', 'default_meta_description', 'default_meta_keywords'];
-    private const BOOL = ['custom_font_body', 'enable_english', 'show_whatsapp_button', 'maintenance_mode', 'analytics_enabled', 'analytics_track_bots', 'analytics_track_admins', 'analytics_geo', 'mail_smtp_probe'];
+    private const BOOL = ['enable_english', 'show_whatsapp_button', 'maintenance_mode', 'analytics_enabled', 'analytics_track_bots', 'analytics_track_admins', 'analytics_geo', 'mail_smtp_probe'];
     private const INT = ['analytics_retention_days', 'smtp_port'];
     private const IMAGE = ['logo', 'favicon', 'og_image'];
     private const RAW = ['robots_txt', 'head_scripts'];
@@ -43,10 +43,12 @@ final class SettingsController extends AdminController
             } elseif ($key === 'accent_color') {
                 $v = strtoupper(trim($r->str($key)));
                 $values[$key] = preg_match('/^#[0-9A-F]{6}$/', $v) ? $v : '';
-            } elseif ($key === 'heading_font') {
-                $values[$key] = in_array($r->str($key), ['sans', 'serif', 'custom'], true) ? $r->str($key) : 'serif';
-            } elseif ($key === 'custom_font_regular' || $key === 'custom_font_bold') {
-                continue; // managed by uploadFont() / removeFont()
+            } elseif ($key === 'heading_font' || $key === 'body_font') {
+                $v = $r->str($key);
+                if (!isset(Settings::fonts()[$v]) || ($v === 'custom' && (string)Settings::get('custom_font_regular', '') === '')) $v = 'lusail';
+                $values[$key] = $v;
+            } elseif (str_starts_with($key, 'custom_font_') && $key !== 'custom_font_name') {
+                continue; // font files are managed by uploadFont() / removeFont()
             } elseif ($key === 'custom_font_name') {
                 $values[$key] = mb_substr(trim(preg_replace('/[^\p{L}\p{N} \-]/u', '', $r->str($key))), 0, 40) ?: 'Custom';
             } elseif ($key === 'radius') {
@@ -86,10 +88,15 @@ final class SettingsController extends AdminController
         \App\Core\Session::flash('success', t('settings.saved'));
         Response::back(admin_url('settings/' . $group));
     }
-    /** Upload a custom font file (woff2 / woff / ttf / otf) into one of the two slots */
+    private static function slotKey(string $slot): string
+    {
+        return Settings::fontSlots()[$slot][0] ?? 'custom_font_regular';
+    }
+
+    /** Upload a custom font file (woff2 / woff / ttf / otf) into one of the four weight slots */
     public function uploadFont(Request $r): void
     {
-        $slot = $r->str('slot') === 'bold' ? 'custom_font_bold' : 'custom_font_regular';
+        $slot = self::slotKey($r->str('slot'));
         $file = $_FILES['font'] ?? null;
         $path = $file ? self::storeFont($file) : '';
         if ($path === '') $this->fail(t('settings.font_invalid'), admin_url('settings/appearance'));
@@ -102,10 +109,12 @@ final class SettingsController extends AdminController
 
     public function removeFont(Request $r): void
     {
-        $slot = $r->str('slot') === 'bold' ? 'custom_font_bold' : 'custom_font_regular';
+        $slot = self::slotKey($r->str('slot'));
         $old = (string)Settings::get($slot, '');
         $values = [$slot => ''];
-        if ($slot === 'custom_font_regular' && Settings::get('heading_font') === 'custom') $values['heading_font'] = 'serif';
+        if ($slot === 'custom_font_regular') { // the regular weight is the one the site needs: fall back to Lusail without it
+            foreach (['heading_font', 'body_font'] as $k) if (Settings::get($k) === 'custom') $values[$k] = 'lusail';
+        }
         Settings::save($values, 'appearance');
         self::unlinkFont($old);
         $this->log('font', 'settings', $slot, ['removed' => $old]);
@@ -137,8 +146,8 @@ final class SettingsController extends AdminController
     private static function unlinkFont(string $path): void
     {
         if ($path !== '' && preg_match('#^/uploads/fonts/font-[a-f0-9]{12}\.(woff2|woff|ttf|otf)$#', $path)) {
-            $other = [(string)Settings::get('custom_font_regular', ''), (string)Settings::get('custom_font_bold', '')];
-            if (!in_array($path, $other, true)) @unlink(PUBLIC_PATH . $path);
+            $others = array_map(fn($s) => (string)Settings::get($s[0], ''), Settings::fontSlots());
+            if (!in_array($path, $others, true)) @unlink(PUBLIC_PATH . $path);
         }
     }
 }

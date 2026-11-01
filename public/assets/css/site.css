@@ -64,6 +64,14 @@ html[data-fonts="sans"] .display { font-weight: 600; letter-spacing: -.02em; lin
 html[data-fonts="sans"] .display--hero { font-size: clamp(2.3rem, 5.6vw, 5rem); line-height: 1.12; }
 html[data-fonts="custom"] .display { font-weight: 400; letter-spacing: 0; line-height: 1.2; }
 html[data-fonts="custom"] .display--hero { line-height: 1.15; }
+html[data-fonts="lusail"] { --font-display: 'Lusail', 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', system-ui, sans-serif; }
+html[data-fonts="lusail"] .display { font-weight: 400; letter-spacing: 0; line-height: 1.2; }
+html[data-fonts="lusail"] .display--hero { font-size: clamp(2.4rem, 5.8vw, 5.2rem); line-height: 1.1; }
+html[data-fonts="lusail"] .display strong, html[data-fonts="lusail"] .display b { font-weight: 500; }
+/* body typeface (Admin → Settings → Appearance); the default stays the Plex / Jakarta pair above */
+html[data-body="lusail"] { --font-body: 'Lusail', 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', system-ui, sans-serif; }
+html[data-body="serif"] { --font-body: 'Amiri', 'Cormorant Garamond', Georgia, serif; }
+html[data-body="serif"][lang="en"] { --font-body: 'Cormorant Garamond', 'Amiri', Georgia, serif; }
 html[data-radius="sharp"] { --r-xl: .6rem; --r-lg: .5rem; --r-md: .4rem; --r-sm: .3rem; }
 html[data-radius="sharp"] .btn, html[data-radius="sharp"] .nav-pill, html[data-radius="sharp"] .lang-switch, html[data-radius="sharp"] .filters button { border-radius: .4rem; }
 html[data-radius="sharp"] .btn__ico, html[data-radius="sharp"] .socials a, html[data-radius="sharp"] .service-list__ico, html[data-radius="sharp"] .feature__ico { border-radius: .3rem; }

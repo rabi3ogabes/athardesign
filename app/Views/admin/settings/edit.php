@@ -5,6 +5,9 @@ $img = fn(string $k, array $o = []) => view('admin/partials/field-image', array_
 $tg = fn(string $k) => view('admin/partials/field', ['name' => $k, 'label' => t('settings.' . $k), 'type' => 'toggle', 'value' => $values[$k] ?? false]);
 $icons = ['general' => 'gear', 'appearance' => 'palette', 'contact' => 'phone', 'social' => 'share-network', 'seo' => 'magnifying-glass', 'analytics' => 'chart-line-up', 'mail' => 'envelope-simple'];
 $themes = App\Models\Settings::themes();
+$fonts = App\Models\Settings::fonts();
+$fontSlots = App\Models\Settings::fontSlots();
+$fontOpts = array_map(fn($f) => $f[lang()] ?? $f['en'], $fonts);
 ?>
 <div class="grid-settings">
   <nav class="subnav">
@@ -52,12 +55,17 @@ $themes = App\Models\Settings::themes();
               </div>
             </div>
             <div class="grid-2">
-              <?= $f('heading_font', ['type' => 'select', 'options' => ['serif' => t('settings.heading_serif'), 'sans' => t('settings.heading_sans'), 'custom' => t('settings.heading_custom')]]) ?>
-              <?= $f('radius', ['type' => 'select', 'options' => ['soft' => t('settings.radius_soft'), 'sharp' => t('settings.radius_sharp')]]) ?>
+              <?= $f('heading_font', ['type' => 'select', 'options' => $fontOpts, 'hint' => t('settings.heading_font_hint')]) ?>
+              <?= $f('body_font', ['type' => 'select', 'options' => $fontOpts, 'hint' => t('settings.body_font_hint')]) ?>
+            </div>
+            <div class="font-samples">
+              <?php foreach ($fonts as $key => $font): if ($key === 'custom' && ($values['custom_font_regular'] ?? '') === '') continue; ?>
+                <div class="font-samples__item" style="font-family:<?= e($font['stack']) ?>"><span class="hint"><?= e($font[lang()] ?? $font['en']) ?></span><p>أثر لتصميم الويب — Athar Web Design 0123</p></div>
+              <?php endforeach; ?>
             </div>
             <div class="grid-2">
-              <?= $f('custom_font_name', ['hint' => t('settings.custom_font_hint'), 'placeholder' => 'Lusail']) ?>
-              <?= $tg('custom_font_body') ?>
+              <?= $f('radius', ['type' => 'select', 'options' => ['soft' => t('settings.radius_soft'), 'sharp' => t('settings.radius_sharp')]]) ?>
+              <?= $f('custom_font_name', ['hint' => t('settings.custom_font_name_hint'), 'placeholder' => 'Custom']) ?>
             </div>
             <p class="hint"><a class="link" href="<?= e(base_url()) ?>/" target="_blank" rel="noopener"><?= e(t('settings.preview')) ?> ↗</a></p>
           <?php elseif ($group === 'contact'): ?>
@@ -107,11 +115,15 @@ $themes = App\Models\Settings::themes();
     <?php if ($group === 'appearance'): ?>
       <div class="card">
         <div class="card__head"><h2><?= icon('text-aa') ?><?= e(t('settings.custom_font')) ?></h2></div>
-        <div class="card__body grid-2">
-          <?php foreach (['regular' => 'custom_font_regular', 'bold' => 'custom_font_bold'] as $slot => $key): $cur = (string)($values[$key] ?? ''); ?>
+        <div class="card__body stack">
+          <p class="hint"><?= e(t('settings.custom_font_hint')) ?></p>
+          <?php $preview = ''; foreach ($fontSlots as [$key, $weight]) { $cur = (string)($values[$key] ?? ''); if ($cur !== '') $preview .= "@font-face{font-family:'AtharCustomPreview';font-weight:" . e($weight) . ";src:url('" . e(base_url() . $cur) . "')}"; } ?>
+          <?php if ($preview !== ''): ?><style><?= $preview ?></style><?php endif; ?>
+          <div class="grid-2">
+          <?php foreach ($fontSlots as $slot => [$key, $weight]): $cur = (string)($values[$key] ?? ''); ?>
             <div class="field">
               <div class="field__label"><label><?= e(t('settings.' . $key)) ?></label><?php if ($cur !== ''): ?><span class="hint"><?= e(t('settings.font_current')) ?>: <code dir="ltr"><?= e(basename($cur)) ?></code></span><?php endif; ?></div>
-              <?php if ($cur !== ''): ?><p class="font-sample" style="font-family:'AtharCustomPreview<?= $slot === 'bold' ? 'B' : '' ?>'"><style>@font-face{font-family:'AtharCustomPreview<?= $slot === 'bold' ? 'B' : '' ?>';src:url('<?= e(base_url() . $cur) ?>')}</style>أثر لتصميم الويب — Athar Web Design 0123</p><?php endif; ?>
+              <?php if ($cur !== ''): ?><p class="font-sample" style="font-family:'AtharCustomPreview';font-weight:<?= e(explode(' ', $weight)[0]) ?>">أثر لتصميم الويب — Athar Web Design 0123</p><?php endif; ?>
               <div class="row">
                 <form method="post" action="<?= e(admin_url('settings/font')) ?>" enctype="multipart/form-data" class="row"><?= csrf_field() ?><input type="hidden" name="slot" value="<?= e($slot) ?>">
                   <label class="btn btn--ghost btn--sm file-btn"><?= icon('upload-simple') ?><span><?= e(t('settings.font_upload')) ?></span><input type="file" name="font" accept=".woff2,.woff,.ttf,.otf,font/woff2,font/woff,font/ttf,font/otf" hidden onchange="this.form.submit()"></label>
@@ -120,6 +132,7 @@ $themes = App\Models\Settings::themes();
               </div>
             </div>
           <?php endforeach; ?>
+          </div>
         </div>
       </div>
     <?php endif; ?>

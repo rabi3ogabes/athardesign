@@ -29,12 +29,14 @@ final class Settings
             // appearance
             'theme'        => 'ink',
             'accent_color' => '',
-            'heading_font' => 'serif',
+            'heading_font' => 'lusail',
+            'body_font'    => 'lusail',
             'radius'       => 'soft',
-            'custom_font_name'    => 'Lusail',
+            'custom_font_name'    => 'Custom',
+            'custom_font_light'   => '',
             'custom_font_regular' => '',
+            'custom_font_medium'  => '',
             'custom_font_bold'    => '',
-            'custom_font_body'    => false,
             // contact
             'whatsapp_number'  => '974',
             'whatsapp_message' => ['ar' => 'مرحبًا أثر، أود الاستفسار عن خدماتكم.', 'en' => 'Hello Athar, I would like to ask about your services.'],
@@ -91,7 +93,7 @@ final class Settings
     {
         return [
             'general'   => ['site_name', 'tagline', 'logo', 'favicon', 'default_lang', 'enable_english', 'header_cta_text', 'header_cta_link', 'footer_text', 'show_whatsapp_button', 'maintenance_mode'],
-            'appearance' => ['theme', 'accent_color', 'heading_font', 'radius', 'custom_font_name', 'custom_font_regular', 'custom_font_bold', 'custom_font_body'],
+            'appearance' => ['theme', 'accent_color', 'heading_font', 'body_font', 'radius', 'custom_font_name', 'custom_font_light', 'custom_font_regular', 'custom_font_medium', 'custom_font_bold'],
             'contact'   => ['whatsapp_number', 'whatsapp_message', 'phone', 'email', 'address', 'map_link', 'working_hours', 'notify_email'],
             'social'    => ['social_instagram', 'social_facebook', 'social_tiktok', 'social_snapchat', 'social_x', 'social_linkedin', 'social_youtube', 'social_threads', 'social_pinterest', 'social_behance', 'social_telegram'],
             'seo'       => ['meta_title_suffix', 'default_meta_description', 'default_meta_keywords', 'og_image', 'schema_type', 'google_verification', 'bing_verification', 'ga4_id', 'gtm_id', 'geo_lat', 'geo_lng', 'robots_txt', 'head_scripts'],
@@ -131,6 +133,23 @@ final class Settings
         }
         self::$all = null;
         Cache::flush();
+    }
+
+    /** Typefaces the site can use for headlines and body text (key => labels + CSS stack for previews) */
+    public static function fonts(): array
+    {
+        return [
+            'lusail' => ['ar' => 'لوسيل (الخط القطري، عربي ولاتيني)', 'en' => 'Lusail (Qatar typeface, Arabic & Latin)', 'stack' => "'Lusail', sans-serif"],
+            'serif'  => ['ar' => 'سيريف تحريري (Amiri / Cormorant)', 'en' => 'Editorial serif (Amiri / Cormorant)', 'stack' => "'Amiri', 'Cormorant Garamond', serif"],
+            'sans'   => ['ar' => 'عصري بدون زوائد (IBM Plex Arabic / Plus Jakarta)', 'en' => 'Modern sans (IBM Plex Arabic / Plus Jakarta)', 'stack' => "'IBM Plex Sans Arabic', 'Plus Jakarta Sans', sans-serif"],
+            'custom' => ['ar' => 'خط مرفوع (' . self::get('custom_font_name', 'Custom') . ')', 'en' => 'Uploaded font (' . self::get('custom_font_name', 'Custom') . ')', 'stack' => "'AtharCustomPreview', sans-serif"],
+        ];
+    }
+
+    /** The four upload slots of the custom typeface: slot => [setting key, CSS weight] */
+    public static function fontSlots(): array
+    {
+        return ['light' => ['custom_font_light', '300'], 'regular' => ['custom_font_regular', '400'], 'medium' => ['custom_font_medium', '500'], 'bold' => ['custom_font_bold', '600 700']];
     }
 
     /** Theme presets shown in the admin (key => labels + swatch colours) */

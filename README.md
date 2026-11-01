@@ -14,7 +14,7 @@ Runs on any ordinary PHP hosting (cPanel, Plesk, DirectAdmin, a VPS with Apache 
 | Admin panel | Dashboard with charts, visitors, clicks, enquiries, page builder (17 block types), services, portfolio + categories, testimonials, media library (auto WebP), settings (site, **appearance / themes**, contact & WhatsApp, social links, SEO, analytics, mail), users & roles, activity log, Arabic/English UI |
 | Packages | Silver / Elite / Premium tiers per service line (combined website + social media by default; website, social, SEO, photography lines available). Each card has price, delivery time, included / excluded items, a detail page with Product + Offer JSON-LD, and an **Order on WhatsApp** button that opens WhatsApp with the package name and price already written |
 | Email marketing | SMTP senders (several, rotated within hourly/daily limits), contact lists with import + verification scoring, HTML templates, campaigns with an inbox score (SPF / DKIM / DMARC / content checks), DKIM signing, List-Unsubscribe one-click, open / click / unsubscribe tracking and bounce suppression |
-| Appearance | Six theme presets (Ink & brass, Ivory, Doha sand, Oud, Emerald, Midnight), custom accent colour, serif / sans / **custom uploaded typeface** (e.g. Lusail) for headlines and optionally body text, soft or sharp corners |
+| Appearance | Six theme presets (Ink & brass, Ivory, Doha sand, Oud, Emerald, Midnight), custom accent colour, headline and body typefaces chosen separately from **Lusail** (the Qatar typeface, shipped with the site and the default), an editorial serif, a modern sans or an **uploaded typeface** (up to four weights), soft or sharp corners |
 | Brand | Square-Kufi أثر mark (brass letters, ivory pixels) with Arabic/English lockups, light and one-colour versions, favicon + app icons and the social preview image in `public/assets/img/`; masters, test sheet, board and guidelines in `design/logo/` |
 | Installer | `/install` sets everything up from the browser: server check → database → first admin. No SSH needed |
 
@@ -111,7 +111,7 @@ Hosts without shell cron can call the URL printed by `php tools/mail-worker.php 
 
 Settings → Appearance (or the colour dots on the dashboard) switches the whole website theme instantly; the header logo picks the light variant automatically on light themes. Upload your own logo in Settings → General to override the built-in one.
 
-**Custom typeface (e.g. Lusail):** in Settings → Appearance upload the regular (and optionally bold) font file you hold a licence for (woff2 / woff / ttf / otf, up to 5 MB), set *Headline typeface* to **Custom**, and tick *Also use it for body text* if you want it everywhere.
+**Typefaces:** Lusail ships in `public/assets/fonts/lusail/` (light, regular, medium, bold as woff2 + woff) and is the default for headlines and body text. In Settings → Appearance the *Headline typeface* and *Body typeface* are chosen separately from Lusail, the editorial serif (Amiri / Cormorant), the modern sans (IBM Plex Sans Arabic / Plus Jakarta Sans) or an uploaded font. To use your own font, upload the files you hold a licence for (woff2 / woff / ttf / otf, up to 5 MB each; regular required, light / medium / bold optional), name it, then pick *Uploaded font* in either list.
 
 ## 5. Packages & WhatsApp ordering
 
