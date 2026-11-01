@@ -39,15 +39,14 @@ $icoFor = fn(string $k) => $k === 'social' ? 'instagram-logo' : ($k === 'seo' ? 
       </div>
     <?php endforeach; ?>
 
-    <div class="pk-foot" data-reveal>
-      <p class="pk-foot__note"><?= e(t('site.package_price_note')) ?></p>
-      <?php if (!empty($b['show_custom'])): ?>
+    <?php if (!empty($b['show_custom'])): ?>
+      <div class="pk-foot" data-reveal>
         <div class="pk-foot__custom">
           <div><strong><?= e(t('site.package_custom')) ?></strong><span><?= e(t('site.package_custom_text')) ?></span></div>
           <?php $wa = whatsapp_link(); ?>
           <a class="btn btn--pill btn--ghost" href="<?= e($wa !== '' ? $wa : url('/contact')) ?>" <?= $wa !== '' ? 'target="_blank" rel="noopener"' : '' ?> data-track="<?= $wa !== '' ? 'whatsapp' : 'cta' ?>" data-label="package-custom"><span><?= e(t('site.lets_talk')) ?></span><i class="btn__ico"><?= icon($wa !== '' ? 'brand-whatsapp' : 'arrow-up-right') ?></i></a>
         </div>
-      <?php endif; ?>
-    </div>
+      </div>
+    <?php endif; ?>
   </div>
 </section>

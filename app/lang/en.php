@@ -29,7 +29,6 @@ return [
         'package_most_popular' => 'Most popular',
         'package_delivery' => 'Delivery',
         'package_compare' => 'Compare the other tiers',
-        'package_price_note' => 'Prices exclude VAT where applicable. Final quote confirmed on WhatsApp.',
         'package_ready' => 'Your message is ready — just press send.',
         'package_cta_hint' => 'Opens WhatsApp with the package name and price already written.',
         'package_custom' => 'Need something custom?',

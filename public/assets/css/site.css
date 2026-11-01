@@ -737,7 +737,6 @@ html[lang="en"] .pk__amount { font-weight: 500; }
 .pk__msg-label .icon { width: 16px; height: 16px; fill: currentColor; }
 .pk__msg p { white-space: pre-line; color: var(--fg); }
 .pk-foot { margin-top: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; align-items: center; text-align: center; }
-.pk-foot__note { font-size: .82rem; color: var(--fg-mute); }
 .pk-foot__custom { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; width: 100%; padding: 1.4rem 1.6rem; border-radius: var(--r-lg); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); text-align: start; }
 .pk-foot__custom div { display: flex; flex-direction: column; gap: .2rem; }
 .pk-foot__custom strong { font-family: var(--font-display); font-size: 1.3rem; }
