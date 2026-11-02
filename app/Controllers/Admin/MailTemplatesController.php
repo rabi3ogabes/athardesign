@@ -62,7 +62,7 @@ final class MailTemplatesController extends AdminController
     /** Live preview with merge tags filled (sandboxed iframe) */
     public function preview(Request $r): void
     {
-        $html = (string)$r->input('html', '');
+        $html = Mail::unescapeHtml((string)$r->input('html', ''));
         if ($html === '' && $r->query('id')) { $t = Mail::template((string)$r->query('id')); $html = $t['html'] ?? ''; }
         if ($html === '' && $r->query('starter')) { $html = CampaignRunner::starterTemplates()[(string)$r->query('starter')]['html'] ?? ''; }
         $row = ['email' => 'client@example.com', 'name' => 'محمد العلي', 'company' => 'Sample Café', 'token' => str_repeat('0', 24)];
@@ -77,7 +77,7 @@ final class MailTemplatesController extends AdminController
     {
         $name = mb_substr(strip_tags($r->str('name')), 0, 120);
         if ($name === '') return t('validation.required', ['field' => t('mail.template_name')]);
-        $html = (string)$r->input('html', '');
+        $html = Mail::unescapeHtml((string)$r->input('html', ''));
         if (strlen($html) > 400000) return t('mail.html_too_large');
         $html = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $html) ?? $html;
         return ['name' => $name, 'subject' => mb_substr(strip_tags($r->str('subject')), 0, 200), 'html' => $html];

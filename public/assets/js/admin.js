@@ -479,7 +479,8 @@
   if (cform) {
     bindPreview(cform);
     const ta = $('[data-html-editor]', cform);
-    const parse = (sel) => { const el = $(sel, cform); try { return JSON.parse(el ? el.innerHTML : '{}'); } catch (e) { return {}; } };
+    // <template> content must be read as text: innerHTML would serialise '<' back to '&lt;' and the HTML would arrive escaped
+    const parse = (sel) => { const el = $(sel, cform); try { return JSON.parse(el ? (el.content || el).textContent : '{}'); } catch (e) { return {}; } };
     const starters = parse('[data-starters]'), templates = parse('[data-templates]');
     const pick = $('[data-template-pick]', cform);
     pick && pick.addEventListener('change', () => {

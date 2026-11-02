@@ -85,7 +85,7 @@ final class MailCampaignsController extends AdminController
         $c = Mail::campaign($id);
         if (!$c) Response::notFound();
         if ($r->input('html') !== null) { // unsaved editor content
-            $c['html'] = (string)$r->input('html'); $c['subject'] = $r->str('subject'); $c['preheader'] = $r->str('preheader');
+            $c['html'] = Mail::unescapeHtml((string)$r->input('html')); $c['subject'] = $r->str('subject'); $c['preheader'] = $r->str('preheader');
             $c['sender_ids'] = (array)$r->input('sender_ids', []); $c['list_ids'] = (array)$r->input('list_ids', []); $c['throttle_per_hour'] = $r->int('throttle_per_hour', 150);
         }
         $score = $this->computeScore($c);
@@ -99,7 +99,7 @@ final class MailCampaignsController extends AdminController
     {
         $c = Mail::campaign($id);
         if (!$c) Response::notFound();
-        if ($r->input('html') !== null) { $c['html'] = (string)$r->input('html'); $c['subject'] = $r->str('subject') ?: $c['subject']; $c['preheader'] = $r->str('preheader'); }
+        if ($r->input('html') !== null) { $c['html'] = Mail::unescapeHtml((string)$r->input('html')); $c['subject'] = $r->str('subject') ?: $c['subject']; $c['preheader'] = $r->str('preheader'); }
         $to = filter_var($r->str('to'), FILTER_VALIDATE_EMAIL) ? $r->str('to') : Auth::user()['email'];
         $senderId = $r->str('sender_id') ?: (string)(((array)$c['sender_ids'])[0] ?? '');
         $s = $senderId ? Mail::sender($senderId) : null;
@@ -238,7 +238,8 @@ final class MailCampaignsController extends AdminController
         if ($name === '') return t('validation.required', ['field' => t('mail.campaign_name')]);
         $senderIds = array_values(array_filter((array)$r->input('sender_ids', []), fn($s) => is_string($s) && $this->isUuid($s)));
         $listIds = array_values(array_filter((array)$r->input('list_ids', []), fn($s) => is_string($s) && $this->isUuid($s)));
-        $html = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', (string)$r->input('html', '')) ?? '';
+        $html = Mail::unescapeHtml((string)$r->input('html', ''));
+        $html = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $html) ?? '';
         if (strlen($html) > 400000) return t('mail.html_too_large');
         $tpl = $r->str('template_id');
         return [

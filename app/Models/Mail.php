@@ -90,6 +90,16 @@ final class Mail
 
     // ---------------- templates ----------------
     public static function templates(): array { return Db::from('mail_templates')->order('updated_at', false)->get(); }
+    /**
+     * HTML that arrives fully entity-escaped (&lt;html&gt; … with no real tag at all) is decoded back to markup.
+     * Happens when markup is copied out of a rendered page or a text field; real markup is never touched.
+     */
+    public static function unescapeHtml(string $html): string
+    {
+        if (str_contains($html, '<') || !preg_match('/&lt;\s*(!doctype|html|body|table|div|p|h[1-6]|a|span|img|td|tr)\b/i', $html)) return $html;
+        return html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+
     public static function template(string $id): ?array { return self::uuid($id) ? Db::from('mail_templates')->eq('id', $id)->first() : null; }
     public static function createTemplate(array $d): array { return Db::from('mail_templates')->insert($d)[0] ?? []; }
     public static function updateTemplate(string $id, array $d): void { Db::from('mail_templates')->eq('id', $id)->update($d); }
