@@ -86,6 +86,11 @@ final class Settings
             'smtp_pass'   => '',
             'smtp_secure' => 'tls',
             'mail_smtp_probe' => true,
+            // ai (Claude)
+            'ai_enabled'        => true,
+            'anthropic_api_key' => '',
+            'ai_model'          => 'claude-opus-5-5',
+            'ai_brand_voice'    => '',
         ];
     }
 
@@ -99,6 +104,7 @@ final class Settings
             'seo'       => ['meta_title_suffix', 'default_meta_description', 'default_meta_keywords', 'og_image', 'schema_type', 'google_verification', 'bing_verification', 'ga4_id', 'gtm_id', 'geo_lat', 'geo_lng', 'robots_txt', 'head_scripts'],
             'analytics' => ['analytics_enabled', 'analytics_track_bots', 'analytics_track_admins', 'analytics_geo', 'analytics_retention_days'],
             'mail'      => ['mail_from', 'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_secure', 'mail_smtp_probe'],
+            'ai'        => ['ai_enabled', 'anthropic_api_key', 'ai_model', 'ai_brand_voice'],
         ];
     }
 

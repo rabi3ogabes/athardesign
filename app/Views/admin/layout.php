@@ -53,7 +53,8 @@ $isActive = function (string $p): string {
 <link rel="stylesheet" href="<?= e(asset('assets/css/fonts.css')) ?>">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/2.0.2/quill.snow.min.css">
 <link rel="stylesheet" href="<?= e(asset('assets/css/admin.css')) ?>">
-<script>window.ATHAR_I18N = <?= json_encode([
+<script>window.ATHAR_AI = <?= json_encode(['enabled' => \App\Core\Claude::configured(), 'lang' => $lang, 'strings' => ['button' => t('ai.js.button'), 'working' => t('ai.js.working'), 'done' => t('ai.js.done'), 'used' => t('ai.js.used'), 'meta_working' => t('ai.js.meta_working'), 'meta_done' => t('ai.js.meta_done'), 'plan_working' => t('ai.js.plan_working'), 'fill_working' => t('ai.js.fill_working'), 'fill_done' => t('ai.js.fill_done'), 'fill_errors' => t('ai.js.fill_errors'), 'nothing' => t('ai.js.nothing'), 'no_text' => t('ai.js.no_text'), 'copied' => t('ai.js.copied')]], JSON_UNESCAPED_UNICODE) ?>;
+window.ATHAR_I18N = <?= json_encode([
     'confirm_delete' => t('common.confirm_delete'), 'yes_delete' => t('common.yes_delete'), 'cancel' => t('common.cancel'),
     'saved' => t('common.saved'), 'error' => t('common.error'), 'copied' => t('common.copied'), 'loading' => t('common.loading'),
     'add_item' => t('editor.add_item'), 'remove_item' => t('editor.remove_item'), 'choose_block' => t('editor.choose_block'),
@@ -135,6 +136,48 @@ window.ATHAR_SCORE_LABELS = <?= json_encode((array)((require APP_PATH . '/lang/m
     </div>
   </div>
 </div>
+
+<!-- Claude assistant -->
+<?php if (\App\Core\Claude::configured()): ?>
+<div class="modal" id="ai-modal" aria-hidden="true">
+  <div class="modal__backdrop" data-modal-close></div>
+  <div class="modal__panel modal__panel--wide" role="dialog" aria-modal="true" aria-labelledby="ai-modal-title">
+    <div class="modal__head"><?= icon('sparkle') ?><h3 id="ai-modal-title"><?= e(t('ai.ask_claude')) ?></h3><span class="hint" data-ai-field-label></span><button type="button" class="btn btn--ghost btn--sm" data-modal-close aria-label="<?= e(t('common.cancel')) ?>">×</button></div>
+    <div class="modal__body ai-body">
+      <div class="ai-controls">
+        <div class="field"><div class="field__label"><label for="ai-task"><?= e(t('ai.task')) ?></label></div>
+          <select class="input" id="ai-task" data-ai-task>
+            <option value="rewrite"><?= e(t('ai.task_rewrite')) ?></option>
+            <option value="improve_seo"><?= e(t('ai.task_improve_seo')) ?></option>
+            <option value="fix_grammar"><?= e(t('ai.task_fix_grammar')) ?></option>
+            <option value="shorten"><?= e(t('ai.task_shorten')) ?></option>
+            <option value="expand"><?= e(t('ai.task_expand')) ?></option>
+            <option value="translate"><?= e(t('ai.task_translate')) ?></option>
+            <option value="write"><?= e(t('ai.task_write')) ?></option>
+            <option value="custom"><?= e(t('ai.task_custom')) ?></option>
+          </select>
+        </div>
+        <div class="field" data-ai-lang-field><div class="field__label"><label for="ai-lang"><?= e(t('ai.language')) ?></label></div>
+          <select class="input" id="ai-lang" data-ai-lang>
+            <option value="ar">عربي</option>
+            <option value="en">English</option>
+            <option value="both"><?= e(t('ai.both_languages')) ?></option>
+          </select>
+        </div>
+        <div class="field"><div class="field__label"><label for="ai-brief"><?= e(t('ai.brief')) ?></label><span class="hint"><?= e(t('ai.brief_hint')) ?></span></div>
+          <textarea class="input" id="ai-brief" rows="3" data-ai-brief placeholder="<?= e(t('ai.brief_placeholder')) ?>"></textarea>
+        </div>
+        <div class="row"><button type="button" class="btn btn--ai" data-ai-run><?= icon('sparkle') ?><span><?= e(t('ai.generate')) ?></span></button><span class="hint" data-ai-status></span></div>
+      </div>
+      <div class="ai-output" data-ai-output hidden>
+        <div class="ai-output__tabs" data-ai-tabs hidden><button type="button" class="is-active" data-ai-tab="ar">عربي</button><button type="button" data-ai-tab="en">English</button></div>
+        <div class="ai-output__pane" data-ai-pane></div>
+        <div class="row row--end"><button type="button" class="btn btn--ghost btn--sm" data-ai-copy><?= icon('copy') ?><span><?= e(t('ai.copy')) ?></span></button><button type="button" class="btn btn--primary btn--sm" data-ai-use><?= icon('check') ?><span><?= e(t('ai.use_result')) ?></span></button></div>
+      </div>
+    </div>
+  </div>
+</div>
+<?php endif; ?>
 
 <!-- confirm dialog -->
 <div class="modal" id="confirm-modal" aria-hidden="true">

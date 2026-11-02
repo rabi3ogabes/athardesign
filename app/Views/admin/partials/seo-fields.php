@@ -1,6 +1,6 @@
 <?php /** $row (array with meta_title, meta_description, meta_keywords, og_image, canonical_url?, noindex?), $withCanonical */ ?>
 <div class="card">
-  <div class="card__head"><h2><?= icon('magnifying-glass') ?><?= e(t('pages.seo')) ?></h2></div>
+  <div class="card__head"><h2><?= icon('magnifying-glass') ?><?= e(t('pages.seo')) ?></h2><?php if (\App\Core\Claude::configured()): ?><button type="button" class="btn btn--ai btn--sm" data-ai-meta data-kind="<?= e($kind ?? 'page') ?>"><?= icon('sparkle') ?><span><?= e(t('ai.generate_meta')) ?></span></button><?php endif; ?></div>
   <div class="card__body stack">
     <?= view('admin/partials/field-i18n', ['name' => 'meta_title', 'label' => t('pages.meta_title'), 'value' => $row['meta_title'] ?? [], 'hint' => t('pages.meta_title_hint'), 'count' => true]) ?>
     <?= view('admin/partials/field-i18n', ['name' => 'meta_description', 'label' => t('pages.meta_description'), 'value' => $row['meta_description'] ?? [], 'type' => 'textarea', 'rows' => 3, 'hint' => t('pages.meta_description_hint'), 'count' => true]) ?>

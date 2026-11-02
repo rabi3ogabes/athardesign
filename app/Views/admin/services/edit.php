@@ -63,7 +63,7 @@ $features = is_array($s['features']) ? $s['features'] : [];
         <?= view('admin/partials/field', ['name' => 'is_featured', 'label' => t('services.is_featured'), 'type' => 'toggle', 'value' => $s['is_featured']]) ?>
         <?= view('admin/partials/field', ['name' => 'sort_order', 'label' => t('common.order'), 'type' => 'number', 'value' => $s['sort_order']]) ?>
       </div></div>
-      <?= view('admin/partials/seo-fields', ['row' => $s]) ?>
+      <?= view('admin/partials/seo-fields', ['row' => $s, 'kind' => 'service']) ?>
     </div>
   </div>
 </form>

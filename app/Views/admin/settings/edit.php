@@ -3,7 +3,7 @@ $f = fn(string $k, array $o = []) => view('admin/partials/field', array_merge(['
 $fi = fn(string $k, array $o = []) => view('admin/partials/field-i18n', array_merge(['name' => $k, 'label' => t('settings.' . $k), 'value' => $values[$k] ?? []], $o));
 $img = fn(string $k, array $o = []) => view('admin/partials/field-image', array_merge(['name' => $k, 'label' => t('settings.' . $k), 'value' => $values[$k] ?? ''], $o));
 $tg = fn(string $k) => view('admin/partials/field', ['name' => $k, 'label' => t('settings.' . $k), 'type' => 'toggle', 'value' => $values[$k] ?? false]);
-$icons = ['general' => 'gear', 'appearance' => 'palette', 'contact' => 'phone', 'social' => 'share-network', 'seo' => 'magnifying-glass', 'analytics' => 'chart-line-up', 'mail' => 'envelope-simple'];
+$icons = ['general' => 'gear', 'appearance' => 'palette', 'contact' => 'phone', 'social' => 'share-network', 'seo' => 'magnifying-glass', 'analytics' => 'chart-line-up', 'mail' => 'envelope-simple', 'ai' => 'sparkle'];
 $themes = App\Models\Settings::themes();
 $fonts = App\Models\Settings::fonts();
 $fontSlots = App\Models\Settings::fontSlots();
@@ -108,6 +108,12 @@ $fontOpts = array_map(fn($f) => $f[lang()] ?? $f['en'], $fonts);
             <div class="grid-2"><?= $f('smtp_user', ['attrs' => 'dir="ltr" autocomplete="off"']) ?><?= view('admin/partials/field', ['name' => 'smtp_pass', 'label' => t('settings.smtp_pass'), 'type' => 'password', 'value' => '', 'placeholder' => ($values['smtp_pass'] ?? '') !== '' ? '••••••••' : '', 'attrs' => 'autocomplete="new-password"']) ?></div>
             <?= $f('smtp_secure', ['type' => 'select', 'options' => ['tls' => 'STARTTLS (587)', 'ssl' => 'SSL (465)', 'none' => 'None']]) ?>
             <?= $tg('mail_smtp_probe') ?>
+          <?php elseif ($group === 'ai'): ?>
+            <p class="hint"><?= e(t('settings.ai_intro')) ?></p>
+            <?= $tg('ai_enabled') ?>
+            <?= view('admin/partials/field', ['name' => 'anthropic_api_key', 'label' => t('settings.anthropic_api_key'), 'type' => 'password', 'value' => '', 'placeholder' => ($values['anthropic_api_key'] ?? '') !== '' ? '••••••••••••' . substr((string)$values['anthropic_api_key'], -4) : 'sk-ant-…', 'hint' => t('settings.anthropic_api_key_hint'), 'attrs' => 'autocomplete="off" spellcheck="false"']) ?>
+            <?= $f('ai_model', ['type' => 'select', 'options' => \App\Core\Claude::MODELS, 'hint' => t('settings.ai_model_hint')]) ?>
+            <?= $f('ai_brand_voice', ['type' => 'textarea', 'rows' => 5, 'hint' => t('settings.ai_brand_voice_hint'), 'placeholder' => t('settings.ai_brand_voice_placeholder')]) ?>
           <?php endif; ?>
         </div>
       </div>
@@ -150,6 +156,22 @@ $fontOpts = array_map(fn($f) => $f[lang()] ?? $f['en'], $fonts);
       <div class="card"><div class="card__body row">
         <form method="post" action="<?= e(admin_url('tools/test-mail')) ?>"><?= csrf_field() ?><button class="btn btn--ghost" type="submit"><?= icon('envelope-simple') ?><span><?= e(t('settings.test_mail')) ?></span></button></form>
       </div></div>
+    <?php elseif ($group === 'ai'): ?>
+      <div class="card">
+        <div class="card__head"><h2><?= icon('sparkle') ?><?= e(t('settings.ai_where')) ?></h2></div>
+        <div class="card__body stack-sm">
+          <ul class="ai-where">
+            <li><?= icon('pencil-simple') ?><span><?= e(t('settings.ai_where_fields')) ?></span></li>
+            <li><?= icon('magnifying-glass') ?><span><?= e(t('settings.ai_where_meta')) ?></span></li>
+            <li><?= icon('gauge') ?><span><?= e(t('settings.ai_where_seo')) ?></span></li>
+            <li><?= icon('envelope-simple') ?><span><?= e(t('settings.ai_where_mail')) ?></span></li>
+          </ul>
+          <div class="row">
+            <form method="post" action="<?= e(admin_url('settings/ai/test')) ?>"><?= csrf_field() ?><button class="btn btn--ghost" type="submit" <?= ($values['anthropic_api_key'] ?? '') === '' ? 'disabled' : '' ?>><?= icon('lightning') ?><span><?= e(t('settings.ai_test')) ?></span></button></form>
+            <a class="btn btn--ghost" href="https://platform.claude.com/" target="_blank" rel="noopener"><?= icon('arrow-square-out') ?><span><?= e(t('settings.ai_console')) ?></span></a>
+          </div>
+        </div>
+      </div>
     <?php endif; ?>
   </div>
 </div>

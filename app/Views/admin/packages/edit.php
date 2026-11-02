@@ -109,7 +109,7 @@ $L = lang();
         <?= view('admin/partials/field-image', ['name' => 'image', 'label' => t('packages.image'), 'value' => $p['image']]) ?>
         <?= view('admin/partials/field', ['name' => 'sort_order', 'label' => t('common.order'), 'type' => 'number', 'value' => $p['sort_order']]) ?>
       </div></div>
-      <?= view('admin/partials/seo-fields', ['row' => $p]) ?>
+      <?= view('admin/partials/seo-fields', ['row' => $p, 'kind' => 'package']) ?>
     </div>
   </div>
 </form>

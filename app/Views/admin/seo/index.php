@@ -34,6 +34,22 @@ $host = base_url();
     </div></div>
   </div>
   <div class="stack">
+    <div class="card card--ai">
+      <div class="card__head"><h2><?= icon('sparkle') ?><?= e(t('ai.seo_card')) ?></h2></div>
+      <div class="card__body stack-sm">
+        <?php if (\App\Core\Claude::configured()): ?>
+          <p class="hint"><?= e(t('ai.seo_card_hint')) ?></p>
+          <div class="row">
+            <button type="button" class="btn btn--ai" data-ai-seo-plan><?= icon('sparkle') ?><span><?= e(t('ai.seo_plan')) ?></span></button>
+            <button type="button" class="btn btn--ghost" data-ai-seo-fill data-confirm-text="<?= e(t('ai.seo_fill_confirm')) ?>"><?= icon('lightning') ?><span><?= e(t('ai.seo_fill')) ?></span></button>
+          </div>
+          <div class="ai-plan prose-sm" data-ai-seo-output hidden></div>
+        <?php else: ?>
+          <p class="hint"><?= e(t('ai.seo_card_setup')) ?></p>
+          <a class="btn btn--ghost btn--sm" href="<?= e(admin_url('settings/ai')) ?>"><?= icon('gear') ?><span><?= e(t('settings.ai')) ?></span></a>
+        <?php endif; ?>
+      </div>
+    </div>
     <div class="card"><div class="card__head"><h2><?= icon('compass') ?><?= e(t('seo.tools')) ?></h2></div><div class="card__body stack-sm">
       <a class="btn btn--ghost" href="https://search.google.com/search-console" target="_blank" rel="noopener"><?= icon('arrow-square-out') ?><span><?= e(t('seo.open_gsc')) ?></span></a>
       <a class="btn btn--ghost" href="https://pagespeed.web.dev/report?url=<?= e(rawurlencode($host . '/')) ?>" target="_blank" rel="noopener"><?= icon('gauge') ?><span><?= e(t('seo.open_psi')) ?></span></a>

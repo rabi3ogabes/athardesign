@@ -13,6 +13,7 @@ Runs on any ordinary PHP hosting (cPanel, Plesk, DirectAdmin, a VPS with Apache 
 | Analytics | Every visitor and page view (device, browser, OS, country/city, referrer, UTM) and every click on WhatsApp / phone / email / social / CTA links, with a visitor timeline. No cookies banner needed: first-party cookie only |
 | Admin panel | Dashboard with charts, visitors, clicks, enquiries, page builder (17 block types), services, portfolio + categories, testimonials, media library (auto WebP), settings (site, **appearance / themes**, contact & WhatsApp, social links, SEO, analytics, mail), users & roles, activity log, Arabic/English UI |
 | Packages | Silver / Elite / Premium tiers per service line (combined website + social media by default; website, social, SEO, photography lines available). Each card has price, delivery time, included / excluded items, a detail page with Product + Offer JSON-LD, and an **Order on WhatsApp** button that opens WhatsApp with the package name and price already written |
+| Claude assistant | Settings → Claude AI holds the Anthropic API key, model and brand-voice notes. Then: a ✦ Claude button on every text, rich-text and bilingual field (rewrite, improve for SEO, fix grammar, shorten, expand, translate, write from a brief, custom instruction, both languages at once), "Generate meta" in every SEO card, and on the SEO health page a prioritised fix plan plus one-click filling of missing meta tags |
 | Email marketing | SMTP senders (several, rotated within hourly/daily limits), contact lists with import + verification scoring, HTML templates, campaigns with an inbox score (SPF / DKIM / DMARC / content checks), DKIM signing, List-Unsubscribe one-click, open / click / unsubscribe tracking and bounce suppression |
 | Appearance | Six theme presets (Ink & brass, Ivory, Doha sand, Oud, Emerald, Midnight), custom accent colour, headline and body typefaces chosen separately from **Lusail** (the Qatar typeface, shipped with the site and the default), an editorial serif, a modern sans or an **uploaded typeface** (up to four weights), soft or sharp corners |
 | Brand | Square-Kufi أثر mark (brass letters, ivory pixels) with Arabic/English lockups, light and one-colour versions, favicon + app icons and the social preview image in `public/assets/img/`; masters, test sheet, board and guidelines in `design/logo/` |
@@ -126,7 +127,11 @@ Admin → Packages lists every tier grouped by service line. The public page `/p
 5. Add real project photos in Portfolio and alt text in the media library.
 6. Work through **SEO → SEO tasks**: the board is pre-filled with the launch checklist.
 
-## 7. Local development
+## 7. Claude assistant
+
+Settings → Claude AI: paste an Anthropic API key (platform.claude.com → API keys), pick a model (Opus 5.5 by default) and optionally describe the brand voice. "Test connection" sends a one-word request. After that every editor field shows a ✦ Claude button, SEO cards get "Generate meta with Claude", and the SEO health page offers a fix plan and "Fill missing meta". The key is stored in the `settings` table; leave the field blank to keep it, enter `-` to remove it. Requests go straight from the server to `api.anthropic.com` (set `ANTHROPIC_BASE_URL` in `.env` only if you route through a proxy).
+
+## 8. Local development
 
 XAMPP / Laragon / any local MySQL works. Create an empty database, then either open `http://localhost:8080/install` or set the `DB_*` values in `.env` and run `php tools/migrate.php --seed`.
 

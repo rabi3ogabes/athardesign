@@ -100,7 +100,7 @@ foreach ($categories as $c) $catOpts[$c['id']] = tr($c['name']);
         <?= view('admin/partials/field', ['name' => 'is_featured', 'label' => t('projects.is_featured'), 'type' => 'toggle', 'value' => $p['is_featured']]) ?>
         <?= view('admin/partials/field', ['name' => 'sort_order', 'label' => t('common.order'), 'type' => 'number', 'value' => $p['sort_order']]) ?>
       </div></div>
-      <?= view('admin/partials/seo-fields', ['row' => $p]) ?>
+      <?= view('admin/partials/seo-fields', ['row' => $p, 'kind' => 'project']) ?>
     </div>
   </div>
 </form>

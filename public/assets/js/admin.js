@@ -422,6 +422,141 @@
         options: { responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: getComputedStyle(document.body).fontFamily } } } }, scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } }, y: { beginAtZero: true, grid: { color: '#EFEBE1' }, ticks: { precision: 0 } } } } });
     });
   }
+
+  /* ---------- Claude assistant ---------- */
+  const AI = window.ATHAR_AI || {};
+  const AS = AI.strings || {};
+  const aiModal = $('#ai-modal');
+  if (AI.enabled && aiModal) {
+    const sparkle = sprite('sparkle');
+    let target = null; // { kind, fields: {ar: el|quillWrap, en: ...}, lang, label, single }
+    const fieldLabel = (el) => { const f = el.closest('.field'); const l = f && f.querySelector('.field__label label'); return l ? l.textContent.replace(/\*\s*$/, '').trim() : ''; };
+    const pageTitle = () => { const t = $('[name="title[' + LANG + ']"]') || $('[name="title[ar]"]') || $('[name="name[' + LANG + ']"]') || $('[name="name[ar]"]') || $('[name="name"]') || $('[name="subject"]'); return (t && t.value) || document.title.split('·')[0].trim(); };
+    const kindOfPage = () => (document.body.dataset.entity || (location.pathname.match(/\/admin\/([a-z-]+)/) || [])[1] || 'page').replace(/s$/, '');
+    const getVal = (el) => { if (!el) return ''; if (el._quill) return el.querySelector('textarea').value; return el.value || ''; };
+    const setVal = (el, v, isHtml) => {
+      if (!el) return;
+      if (el._quill) { el._quill.setContents([]); el._quill.clipboard.dangerouslyPasteHTML(v); return; }
+      el.value = v; el.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    // inject a ✦ button on bilingual fields, rich-text wrappers, plain textareas and the e-mail HTML editor
+    const addButton = (host, cfg) => {
+      if (host.dataset.aiReady) return; host.dataset.aiReady = '1';
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'btn--ai-field'; b.innerHTML = sparkle + '<span>' + esc(AS.button || 'Claude') + '</span>';
+      b.addEventListener('click', (e) => { e.preventDefault(); open(cfg()); });
+      host.classList.add('field--ai-host'); host.appendChild(b);
+    };
+    const scan = (root) => {
+      $$('.field--i18n', root).forEach((f) => {
+        const ar = f.querySelector('[data-lang-col="ar"] [data-richtext], [data-lang-col="ar"] .input'), en = f.querySelector('[data-lang-col="en"] [data-richtext], [data-lang-col="en"] .input');
+        if (!ar && !en) return;
+        const rich = !!(ar && ar.hasAttribute('data-richtext'));
+        addButton(f, () => ({ kind: rich ? 'richtext' : 'text', fields: { ar, en }, lang: LANG, label: fieldLabel(f), single: false }));
+      });
+      $$('[data-html-editor]', root).forEach((ta) => { const f = ta.closest('.field') || ta.parentElement; addButton(f, () => ({ kind: 'html', fields: { ar: ta, en: ta }, lang: /[؀-ۿ]/.test(ta.value) ? 'ar' : 'en', label: fieldLabel(ta), single: true })); });
+      $$('textarea.input:not([data-html-editor]):not([name^="meta_"]):not([name="robots_txt"]):not([name="head_scripts"]):not([name="ai_brand_voice"])', root).forEach((ta) => {
+        if (ta.closest('.field--i18n') || ta.closest('#ai-modal') || ta.closest('[data-richtext]')) return;
+        const f = ta.closest('.field'); if (!f) return;
+        addButton(f, () => ({ kind: 'text', fields: { ar: ta, en: ta }, lang: /[؀-ۿ]/.test(ta.value) ? 'ar' : LANG, label: fieldLabel(ta), single: true }));
+      });
+    };
+    whenReady(() => scan(document));
+    new MutationObserver((muts) => muts.forEach((m) => m.addedNodes.forEach((n) => { if (n.nodeType === 1) scan(n); }))).observe(document.body, { childList: true, subtree: true });
+
+    // modal flow
+    const taskSel = $('[data-ai-task]', aiModal), langSel = $('[data-ai-lang]', aiModal), brief = $('[data-ai-brief]', aiModal), run = $('[data-ai-run]', aiModal);
+    const status = $('[data-ai-status]', aiModal), out = $('[data-ai-output]', aiModal), tabs = $('[data-ai-tabs]', aiModal), pane = $('[data-ai-pane]', aiModal);
+    let result = null, shown = 'ar';
+    const open = (cfg) => {
+      target = cfg; result = null; out.hidden = true; status.textContent = ''; brief.value = '';
+      $('[data-ai-field-label]', aiModal).textContent = cfg.label || '';
+      langSel.value = cfg.lang; $('[data-ai-lang-field]', aiModal).hidden = cfg.single; $('option[value="both"]', langSel).hidden = cfg.single || cfg.kind === 'html';
+      openModal(aiModal);
+    };
+    const render = () => {
+      const isPair = result && typeof result === 'object';
+      tabs.hidden = !isPair; $$('button', tabs).forEach((b) => b.classList.toggle('is-active', b.dataset.aiTab === shown));
+      const text = isPair ? (result[shown] || '') : (result || '');
+      const dir = (isPair ? shown : (target.lang === 'both' ? 'ar' : (taskSel.value === 'translate' ? (target.lang === 'ar' ? 'en' : 'ar') : target.lang))) === 'ar' ? 'rtl' : 'ltr';
+      pane.setAttribute('dir', dir);
+      if (target.kind === 'html') { pane.innerHTML = '<iframe sandbox="allow-same-origin" title="preview"></iframe>'; const fr = pane.querySelector('iframe'); fr.srcdoc = text; }
+      else if (target.kind === 'richtext') { pane.innerHTML = text; }
+      else { pane.innerHTML = '<textarea></textarea>'; pane.querySelector('textarea').value = text; }
+      out.hidden = false;
+    };
+    tabs.addEventListener('click', (e) => { const b = e.target.closest('[data-ai-tab]'); if (b) { shown = b.dataset.aiTab; render(); } });
+    run.addEventListener('click', async () => {
+      if (!target) return;
+      const lang = target.single ? target.lang : langSel.value;
+      const src = lang === 'both' ? target.fields.ar : (target.fields[lang] || target.fields.ar);
+      const other = lang === 'both' ? target.fields.en : (target.fields[lang === 'ar' ? 'en' : 'ar']);
+      const text = getVal(src), otherText = target.single ? '' : getVal(other);
+      const task = taskSel.value;
+      if (task !== 'write' && !text.trim() && !otherText.trim()) { status.textContent = AS.no_text || ''; return; }
+      run.disabled = true; status.textContent = AS.working || '…';
+      try {
+        const data = await api(ADMIN + '/ai/generate', { json: { task, kind: target.kind, lang, text, other: otherText, brief: brief.value, context: { title: pageTitle(), type: kindOfPage() + (target.label ? ' ' + target.label : '') } } });
+        result = data.output; shown = 'ar'; render(); status.textContent = AS.done || '';
+      } catch (err) { status.textContent = err.message; }
+      run.disabled = false;
+    });
+    $('[data-ai-copy]', aiModal).addEventListener('click', () => {
+      const text = result && typeof result === 'object' ? (result[shown] || '') : (result || '');
+      navigator.clipboard.writeText(text).then(() => toast(AS.copied || T.copied, 'success')).catch(() => {});
+    });
+    $('[data-ai-use]', aiModal).addEventListener('click', () => {
+      if (!target || result == null) return;
+      // a textarea preview may have been edited by hand: take what is shown
+      const edited = pane.querySelector('textarea'); if (edited && !(result && typeof result === 'object')) result = edited.value;
+      if (result && typeof result === 'object') { setVal(target.fields.ar, result.ar || ''); setVal(target.fields.en, result.en || ''); }
+      else {
+        const lang = target.single ? target.lang : langSel.value;
+        const dest = taskSel.value === 'translate' && !target.single ? target.fields[lang === 'ar' ? 'en' : 'ar'] : (target.fields[lang] || target.fields.ar);
+        setVal(dest, result);
+      }
+      closeModal(aiModal); toast(AS.used || T.saved, 'success');
+    });
+
+    // SEO card: generate meta title / description / keywords from the page content
+    document.addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-ai-meta]'); if (!b) return;
+      e.preventDefault();
+      const form = b.closest('form') || document;
+      const val = (n) => { const el = form.querySelector('[name="' + n + '"]'); return el ? el.value : ''; };
+      const body = { ar: '', en: '' };
+      $$('[data-richtext] textarea, textarea.input:not([name^="meta_"]):not([data-html-editor])', form).forEach((ta) => { const l = /\[en\]$/.test(ta.name || '') ? 'en' : 'ar'; const t = ta.value.replace(/<[^>]+>/g, ' ').trim(); if (t) body[l] += t + '\n'; });
+      $$('input.input[name$="[ar]"], input.input[name$="[en]"]', form).forEach((i) => { if (/^(meta_|slug|nav_label)/.test(i.name)) return; const l = /\[en\]$/.test(i.name) ? 'en' : 'ar'; if (i.value.trim()) body[l] += i.value.trim() + '\n'; });
+      const title = { ar: val('title[ar]') || val('name[ar]'), en: val('title[en]') || val('name[en]') };
+      b.disabled = true; toast(AS.meta_working || '…', 'info');
+      try {
+        const data = await api(ADMIN + '/ai/meta', { json: { kind: b.dataset.kind || kindOfPage(), title, body, url: val('slug') } });
+        ['meta_title', 'meta_description', 'meta_keywords'].forEach((f) => ['ar', 'en'].forEach((l) => { const el = form.querySelector('[name="' + f + '[' + l + ']"]'); if (el) { el.value = data.meta[f][l] || ''; el.dispatchEvent(new Event('input', { bubbles: true })); } }));
+        toast(AS.meta_done || T.saved, 'success');
+      } catch (err) { toast(err.message, 'error'); }
+      b.disabled = false;
+    });
+
+    // SEO overview: fix plan + bulk meta fill
+    const planBtn = $('[data-ai-seo-plan]'), fillBtn = $('[data-ai-seo-fill]'), planOut = $('[data-ai-seo-output]');
+    planBtn && planBtn.addEventListener('click', async () => {
+      planBtn.disabled = true; planOut.hidden = false; planOut.innerHTML = '<p class="hint">' + esc(AS.plan_working || '…') + '</p>';
+      try { const d = await api(ADMIN + '/ai/seo-plan', { json: {} }); planOut.innerHTML = d.html; }
+      catch (err) { planOut.innerHTML = '<p class="hint">' + esc(err.message) + '</p>'; }
+      planBtn.disabled = false;
+    });
+    fillBtn && fillBtn.addEventListener('click', () => {
+      Promise.resolve(window.confirm(fillBtn.dataset.confirmText || '')).then(async (ok) => {
+        if (!ok) return;
+        fillBtn.disabled = true; toast(AS.fill_working || '…', 'info');
+        try {
+          const d = await api(ADMIN + '/ai/seo-fill', { json: {} });
+          if (!d.done.length && !d.errors.length) toast(AS.nothing || '', 'info');
+          else { toast((AS.fill_done || ':n').replace(':n', d.done.length), 'success'); if (d.errors.length) toast((AS.fill_errors || ':e').replace(':e', d.errors.join('; ')), 'error'); setTimeout(() => location.reload(), 1800); }
+        } catch (err) { toast(err.message, 'error'); }
+        fillBtn.disabled = false;
+      });
+    });
+  }
 })();
 
 /* appearance: colour picker <-> hex field */

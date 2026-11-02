@@ -175,6 +175,11 @@ if ($isAdmin) {
             $r->get('/settings', [A\SettingsController::class, 'edit']);
             $r->post('/settings/font', [A\SettingsController::class, 'uploadFont']);
             $r->post('/settings/font/remove', [A\SettingsController::class, 'removeFont']);
+            $r->post('/settings/ai/test', [A\AiController::class, 'test']);
+            $r->post('/ai/generate', [A\AiController::class, 'generate']);
+            $r->post('/ai/meta', [A\AiController::class, 'meta']);
+            $r->post('/ai/seo-plan', [A\AiController::class, 'seoPlan']);
+            $r->post('/ai/seo-fill', [A\AiController::class, 'seoFill']);
             $r->get('/settings/{group}', [A\SettingsController::class, 'edit']);
             $r->post('/settings/{group}', [A\SettingsController::class, 'update']);
             $r->get('/users', [A\UsersController::class, 'index']);

@@ -10,7 +10,7 @@ use App\Models\Settings;
 final class SettingsController extends AdminController
 {
     private const I18N = ['site_name', 'tagline', 'header_cta_text', 'footer_text', 'whatsapp_message', 'address', 'working_hours', 'meta_title_suffix', 'default_meta_description', 'default_meta_keywords'];
-    private const BOOL = ['enable_english', 'show_whatsapp_button', 'maintenance_mode', 'analytics_enabled', 'analytics_track_bots', 'analytics_track_admins', 'analytics_geo', 'mail_smtp_probe'];
+    private const BOOL = ['ai_enabled', 'enable_english', 'show_whatsapp_button', 'maintenance_mode', 'analytics_enabled', 'analytics_track_bots', 'analytics_track_admins', 'analytics_geo', 'mail_smtp_probe'];
     private const INT = ['analytics_retention_days', 'smtp_port'];
     private const IMAGE = ['logo', 'favicon', 'og_image'];
     private const RAW = ['robots_txt', 'head_scripts'];
@@ -66,6 +66,15 @@ final class SettingsController extends AdminController
             } elseif ($key === 'smtp_pass') {
                 $v = (string)$r->input($key, '');
                 $values[$key] = $v === '' ? (string)Settings::get('smtp_pass', '') : mb_substr($v, 0, 300);
+            } elseif ($key === 'anthropic_api_key') {
+                $v = trim((string)$r->input($key, ''));
+                if ($v === '') $values[$key] = (string)Settings::get('anthropic_api_key', ''); // blank keeps the saved key
+                elseif ($v === '-') $values[$key] = ''; // a single dash removes it
+                else $values[$key] = preg_match('/^[A-Za-z0-9_\-]{20,300}$/', $v) ? $v : (string)Settings::get('anthropic_api_key', '');
+            } elseif ($key === 'ai_model') {
+                $values[$key] = isset(\App\Core\Claude::MODELS[$r->str($key)]) ? $r->str($key) : 'claude-opus-5-5';
+            } elseif ($key === 'ai_brand_voice') {
+                $values[$key] = mb_substr(strip_tags((string)$r->input($key, '')), 0, 3000);
             } elseif ($key === 'whatsapp_number') {
                 $values[$key] = preg_replace('/\D+/', '', $r->str($key));
             } elseif ($key === 'default_lang') {
